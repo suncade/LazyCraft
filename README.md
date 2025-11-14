@@ -249,7 +249,7 @@ docker compose up -d
 ```
 
 ```bash
-# 望更新当前镜像（例如更新我们的 dev-latest 版本）
+# 当希望更新当前镜像（例如更新我们的 dev-latest 版本）
 # docker compose up -d --pull always
 # 或
 # docker pull registry.cn-hangzhou.aliyuncs.com/lazyllm/lazycraft-xxx:dev-latest
