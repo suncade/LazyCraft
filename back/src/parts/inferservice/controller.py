@@ -95,8 +95,9 @@ class ListService(Resource):
         status = data.get("status", [])
         user_id = data.get("user_id", [])
         tenant = data.get("tenant", "")
+        # 调用InferService获取服务列表和分页信息
         result, pagination_info = self.infer_service.list_infer_model_service(
-            page, per_page, qtype, search_name, status, user_id, tenant
+            page=page, per_page=per_page, qtype=qtype, search_name=search_name, status=status, user_id=user_id, tenant=tenant
         )
 
         return build_response(
@@ -221,7 +222,7 @@ class CreateService(Resource):
             return jsonify({"error": "Model not found"})
         # 将新建的服务信息以JSON格式返回
         self.infer_service.create_infer_model_service(
-            data.get("group_id"), group_info.model_id, data.get("services"),model_num_gpus
+            data.get("group_id"), group_info.model_id, data.get("services")
         )
         return build_response(message="Service created successfully")
 
