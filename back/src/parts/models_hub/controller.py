@@ -251,14 +251,9 @@ class ModelOnlineListDeleteApi(Resource):
         model_keys = data.get("model_keys")
         if not model_id or not model_keys:
             return {"message": "model_id和model_keys不能为空"}, 400
-        try:
-            service = ModelService(current_user)
-            result = service.delete_online_model_list(model_id, model_keys)
-            return result
-        except CommonError as e:
-            return {"message": str(e)}, 400
-        except Exception as e:
-            return {"message": f"删除失败: {str(e)}"}, 500
+        service = ModelService(current_user)
+        result = service.delete_online_model_list(model_id, model_keys)
+        return result
 
 
 class modelRetryDownloadApi(Resource):
@@ -588,11 +583,8 @@ class ModelHubDeleteUploadedFileApi(Resource):
         if not filename or not file_dir:
             return {"message": "filename&file_dir不能为空"}, 400
         service = ModelService(current_user)
-        try:
-            result = service.delete_uploaded_file(filename, file_dir)
-            return result
-        except Exception as e:
-            return {"message": str(e)}, 500
+        result = service.delete_uploaded_file(filename, file_dir)
+        return result
 
 
 class modelHubCheckModelNameApi(Resource):
