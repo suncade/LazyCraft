@@ -881,9 +881,11 @@ class FinetuneService:
 
         # 先刷新任务状态（调用更新任务状态接口）
         job_id = task.task_job_info_dict.get("job_id")
+        lazyllm_status = None
         if job_id:
             from parts.finetune.task_manager import manage
             get_status_result, status, _ = manage.get_ft_status(job_id)
+            lazyllm_status = status
             if not get_status_result:
                 # 获取状态失败，可能是404，说明任务已结束
                 if status and "404" in str(status):
@@ -908,8 +910,12 @@ class FinetuneService:
         task_status = task.status
 
         logging.info(
-            f"pause_task job_id, task_name, task_status: {job_id}, {task_name}, {task_status}"
+            f"pause_task job_id, task_name, task_status: {job_id}, {task_name}, task_status: {task_status}, lazyllm_status: {lazyllm_status}"
         )
+        
+        if task_status == "Suspended":
+            logging.info(f"pause_task: Task {task_id} is already Suspended, treating as success (idempotency)")
+            return True
         
         if task_status not in ["InProgress", "Pending", "Running"]:
             logging.info(f"pause_task task_status {task_status} does not support pause")
