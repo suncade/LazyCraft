@@ -24,12 +24,47 @@ import zipfile
 from io import BytesIO
 from threading import Thread
 
+from flasgger import swag_from
 from flask import (Response, copy_current_request_context, current_app,
                    jsonify, make_response, request, send_file, stream_with_context)
 from flask_login import current_user
 from flask_restful import marshal, marshal_with, reqparse
 
 from core.restful import Resource
+from docs.apidocs.data import (
+    script_list_spec,
+    script_create_spec,
+    script_delete_spec,
+    script_upload_spec,
+    script_update_spec,
+    script_list_by_type_spec,
+    data_set_list_spec,
+    data_set_create_spec,
+    upload_data_set_file_spec,
+    data_set_version_list_spec,
+    data_set_file_list_spec,
+    data_set_tag_list_spec,
+    create_data_set_version_by_tag_spec,
+    data_set_version_publish_spec,
+    data_set_file_spec,
+    data_set_file_update_spec,
+    data_set_spec,
+    data_set_version_spec,
+    data_set_delete_spec,
+    data_set_version_delete_spec,
+    data_set_file_delete_spec,
+    data_set_version_add_file_spec,
+    data_set_version_export_spec,
+    data_set_version_export_ft_spec,
+    test_data_set_version_status_spec,
+    clean_or_augment_data_set_version_spec,
+    clean_or_augment_data_set_version_async_spec,
+    clean_or_augment_data_set_version_async_with_item_count_spec,
+    data_processing_task_progress_spec,
+    data_processing_task_cancel_spec,
+    data_processing_task_list_spec,
+    data_processing_task_stream_spec,
+)
 from libs.feature_gate import require_internet_feature
 from libs.filetools import FileTools
 from libs.json_utils import ensure_list_from_json
@@ -66,6 +101,7 @@ class ScriptListApi(Resource):
     """
 
     @login_required
+    @swag_from(script_list_spec)
     def post(self):
         """获取脚本分页列表。
 
@@ -124,6 +160,7 @@ class ScriptCreateApi(Resource):
     """
 
     @login_required
+    @swag_from(script_create_spec)
     def post(self):
         """创建新脚本。
 
@@ -166,6 +203,7 @@ class ScriptDeleteApi(Resource):
     """
 
     @login_required
+    @swag_from(script_delete_spec)
     def post(self):
         """删除指定脚本。
 
@@ -205,6 +243,7 @@ class ScriptUploadApi(Resource):
     """
 
     @login_required
+    @swag_from(script_upload_spec)
     def post(self):
         """上传脚本文件。
 
@@ -263,6 +302,7 @@ class ScriptUpdateApi(Resource):
 
     @login_required
     @marshal_with(fields.script_field)
+    @swag_from(script_update_spec)
     def post(self):
         """更新指定脚本信息。
 
@@ -304,6 +344,7 @@ class ScriptListByTypeApi(Resource):
     """
 
     @login_required
+    @swag_from(script_list_by_type_spec)
     def get(self):
         """根据脚本类型获取脚本列表。
 
@@ -342,6 +383,7 @@ class DataSetListApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_list_spec)
     def post(self):
         """获取数据集分页列表。
 
@@ -405,6 +447,7 @@ class DataSetCreateApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_create_spec)
     def post(self):
         """创建新数据集。
 
@@ -485,6 +528,7 @@ class UploadDataSetFileApi(Resource):
     """
 
     @login_required
+    @swag_from(upload_data_set_file_spec)
     def post(self):
         """上传数据集文件。
 
@@ -619,6 +663,7 @@ class DataSetVersionListApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_version_list_spec)
     def get(self):
         """获取数据集版本分页列表。
 
@@ -662,6 +707,7 @@ class DataSetFileListApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_file_list_spec)
     def get(self):
         """获取数据集版本下的文件分页列表。
 
@@ -708,6 +754,7 @@ class DataSetTagListApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_tag_list_spec)
     def get(self):
         """获取数据集的标签版本列表。
 
@@ -748,6 +795,7 @@ class CreateDataSetVersionByTagApi(Resource):
     """
 
     @login_required
+    @swag_from(create_data_set_version_by_tag_spec)
     def post(self):
         """根据标签创建数据集版本。
 
@@ -817,6 +865,7 @@ class DataSetVersionPublishApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_version_publish_spec)
     def post(self):
         """发布数据集版本为标签版本。
 
@@ -892,6 +941,7 @@ class DataSetFileApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_file_spec)
     def post(self):
         """获取JSON文件内容并返回给前端。
 
@@ -946,6 +996,7 @@ class DataSetFileUpdateApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_file_update_spec)
     def post(self):
         """修改数据集文件内容。
 
@@ -1005,6 +1056,7 @@ class DataSetDeleteApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_delete_spec)
     def post(self):
         """删除指定的数据集。
 
@@ -1059,6 +1111,7 @@ class DataSetVersionDeleteApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_version_delete_spec)
     def post(self):
         """删除指定的数据集版本。
 
@@ -1125,6 +1178,7 @@ class DataSetFileDeleteApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_file_delete_spec)
     def post(self):
         """删除指定的数据集文件。
 
@@ -1195,6 +1249,7 @@ class DataSetApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_spec)
     def get(self):
         """获取指定数据集的详细信息。
 
@@ -1229,6 +1284,7 @@ class DataSetVersionApi(Resource):
     """
 
     @login_required
+    @swag_from(data_set_version_spec)
     def get(self):
         """获取指定数据集版本的详细信息。
 
@@ -1286,6 +1342,7 @@ class DataSetVersionAddFile(Resource):
     """
 
     @login_required
+    @swag_from(data_set_version_add_file_spec)
     def post(self):
         """向数据集版本添加新文件。
 
@@ -1367,6 +1424,7 @@ class DataSetVersionExportFT(Resource):
         ValueError: 当参数有误或文件不存在时抛出异常。
     """
 
+    @swag_from(data_set_version_export_ft_spec)
     def get(self):
         """导出数据集版本文件（微调专用）。
 
@@ -1432,6 +1490,7 @@ class DataSetVersionExport(Resource):
     """
 
     @login_required
+    @swag_from(data_set_version_export_spec)
     def post(self):
         """导出一个或多个数据集版本。
 
@@ -1555,6 +1614,7 @@ class TestDataSetVersionStatus(Resource):
     """
 
     @login_required
+    @swag_from(test_data_set_version_status_spec)
     def post(self):
         """测试数据集版本状态变更功能。
 
@@ -1608,6 +1668,7 @@ class CleanOrAugmentDataSetVersion(Resource):
 
     @login_required
     @require_internet_feature("数据处理")
+    @swag_from(clean_or_augment_data_set_version_spec)
     def post(self):
         """对数据集版本进行数据清洗或增强处理。
 
@@ -1811,6 +1872,7 @@ class CleanOrAugmentDataSetVersionAsync(Resource):
 
     @login_required
     @require_internet_feature("数据处理")
+    @swag_from(clean_or_augment_data_set_version_async_spec)
     def post(self):
         """异步启动数据集版本的数据清洗或增强处理。
 
@@ -1890,6 +1952,7 @@ class CleanOrAugmentDataSetVersionAsyncWithItemCount(Resource):
 
     @login_required
     @require_internet_feature("数据处理")
+    @swag_from(clean_or_augment_data_set_version_async_with_item_count_spec)
     def post(self):
         """异步启动数据集版本的数据清洗或增强处理（基于数据条数统计）。
 
@@ -1963,6 +2026,7 @@ class DataProcessingTaskProgress(Resource):
     """
 
     @login_required
+    @swag_from(data_processing_task_progress_spec)
     def get(self, task_id):
         """获取指定数据处理任务的进度信息。
 
@@ -2000,6 +2064,7 @@ class DataProcessingTaskCancel(Resource):
     """
 
     @login_required
+    @swag_from(data_processing_task_cancel_spec)
     def post(self, task_id):
         """取消指定的数据处理任务。
 
@@ -2031,6 +2096,7 @@ class DataProcessingTaskList(Resource):
     """
 
     @login_required
+    @swag_from(data_processing_task_list_spec)
     def get(self):
         """获取所有数据处理任务列表。
 
@@ -2059,6 +2125,7 @@ class DataProcessingTaskStream(Resource):
     """
 
     @login_required
+    @swag_from(data_processing_task_stream_spec)
     def get(self, task_id):
         """通过SSE实时推送任务进度。
 

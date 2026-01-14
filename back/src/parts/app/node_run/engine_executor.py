@@ -117,15 +117,29 @@ class EngineExecutor:
 
     def _parse_input_files(
         self, inputs, files: list
-    ) -> tuple[list[str], dict[str, str]]:
+    ) -> list[str]:
         """解析输入文件参数。
 
+        该函数处理开始节点的文件类型输入参数，根据不同的场景采用不同的处理策略。
+        
+        注意：
+        - `lazyllm-query` 格式主要用于 LLM/VLM 模块，它们通过 `LLMBase._get_files` 自动解析
+        - 代码块节点不是 LLM 模块，它直接执行用户代码，需要接收原始的文件路径字符串
+        - 如果后续节点是 LLM/VLM 模块且需要文件，应该从代码块节点的输出中获取文件路径
+        - `_lazyllm_files` 参数在 `LightEngine.run` 中会被使用，但只在单个参数时生效
+        - 函数会直接修改 `inputs` 参数（原地修改），将文件对象替换为文件路径字符串
+
         Args:
-            inputs: 输入数据
-            files (list): 文件列表
+            inputs: 输入数据列表（会被原地修改）
+            files (list): 文件列表，可以是索引（int）或文件对象（dict）
+                - 如果是 int：表示文件在 inputs 中的索引位置
+                - 如果是 dict：表示预览模式的文件对象，包含 id="START_DEFAULT_FILE"
 
         Returns:
-            tuple: 包含lazyllm文件和上传文件的元组
+            list[str]: 预览模式的文件路径列表（用于 `_lazyllm_files` 参数）
+                - 这些文件来自预览模式（START_DEFAULT_FILE），不会被合并到 inputs 中
+                - 如果非预览模式，返回空列表 []
+                - 上传的文件（通过索引指定的）会被直接替换到 inputs 中，不会在这里返回
 
         Raises:
             Exception: 当解析失败时抛出
@@ -135,27 +149,40 @@ class EngineExecutor:
         upload_files = []
         if files and len(files) > 0:
             is_preview = False
+            file_indices = []
             for item in files:
                 if isinstance(item, int):
                     tempFile = inputs[item]
                     if isinstance(tempFile, dict) and tempFile.get("value"):
                         upload_files.append(tempFile["value"])
+                        file_indices.append(item)
 
                 elif isinstance(item, dict) and item.get("value"):
+                    # 预览模式的文件（START_DEFAULT_FILE）
                     if item.get("id") and item["id"] == "START_DEFAULT_FILE":
                         lazyllm_files.append(item["value"])
                         is_preview = True
 
             if not is_preview:
-                inputs_copy = copy.deepcopy(inputs)
-                inputs.clear()
-                new_item = lazyllm.formatter.file(formatter="encode")(
-                    {
-                        "query": inputs_copy[0] if inputs_copy else "",
-                        "files": upload_files,
-                    }
-                )
-                inputs.append(new_item)
+                # 只有一个输入参数且是字符串类型，合并成`lazyllm-query` 格式，主要用于 LLM/VLM 模块，会通过 `LLMBase._get_files` 自动解析
+                if len(inputs) == 1 and isinstance(inputs[0], str) and len(file_indices) > 0:
+                    inputs_copy = copy.deepcopy(inputs)
+                    inputs.clear()
+                    new_item = lazyllm.formatter.file(formatter="encode")(
+                        {
+                            "query": inputs_copy[0] if inputs_copy else "",
+                            "files": upload_files,
+                        }
+                    )
+                    inputs.append(new_item)
+                else:
+                    # 多个参数（包括文件），保持参数独立，只替换文件参数为文件路径
+                    # 后面节点比如代码块节点可以接收独立的参数，文件参数作为字符串路径传递给后续节点
+                    for idx in sorted(file_indices, reverse=True):
+                        if idx < len(inputs):
+                            tempFile = inputs[idx]
+                            if isinstance(tempFile, dict) and tempFile.get("value"):
+                                inputs[idx] = tempFile["value"]
 
         return lazyllm_files
 

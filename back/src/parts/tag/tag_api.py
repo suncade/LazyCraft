@@ -13,10 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from flasgger import swag_from
 from flask_login import current_user
 from flask_restful import reqparse
 
 from core.restful import Resource
+from docs.apidocs.tag import (
+    tag_list_spec,
+    tag_create_spec,
+    tag_delete_spec,
+    tag_binding_update_spec,
+    brand_list_spec,
+    brand_create_spec,
+    brand_delete_spec,
+)
 from libs.login import login_required
 from parts.urls import api
 from utils.util_database import db
@@ -28,6 +38,7 @@ from .tag_service import TagService
 class TagListApi(Resource):
 
     @login_required
+    @swag_from(tag_list_spec)
     def get(self):
         """查询标签列表。
 
@@ -59,6 +70,7 @@ class TagListApi(Resource):
 class TagCreateApi(Resource):
 
     @login_required
+    @swag_from(tag_create_spec)
     def post(self):
         """创建内置标签。
 
@@ -98,6 +110,7 @@ class TagCreateApi(Resource):
 class TagDeleteApi(Resource):
 
     @login_required
+    @swag_from(tag_delete_spec)
     def post(self):
         """删除标签"""
         parser = reqparse.RequestParser()
@@ -114,6 +127,7 @@ class TagDeleteApi(Resource):
 class TagBindingUpdateApi(Resource):
 
     @login_required
+    @swag_from(tag_binding_update_spec)
     def post(self):
         """更新关系"""
         parser = reqparse.RequestParser()
@@ -135,6 +149,7 @@ class TagBindingUpdateApi(Resource):
 
 class BrandListApi(Resource):
     @login_required
+    @swag_from(brand_list_spec)
     def get(self):
         """查询产商"""
         parser = reqparse.RequestParser()
@@ -165,6 +180,7 @@ class BrandListApi(Resource):
 class BrandCreateApi(Resource):
 
     @login_required
+    @swag_from(brand_create_spec)
     def post(self):
         """创建产商标签"""
         parser = reqparse.RequestParser()
@@ -202,6 +218,7 @@ class BrandCreateApi(Resource):
 class BrandDeleteApi(Resource):
 
     @login_required
+    @swag_from(brand_delete_spec)
     def post(self):
         """删除产商"""
         parser = reqparse.RequestParser()

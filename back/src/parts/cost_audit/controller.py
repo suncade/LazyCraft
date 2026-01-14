@@ -15,10 +15,22 @@
 
 from datetime import date, timedelta
 
+from flasgger import swag_from
 from flask import request
 from flask_login import current_user
 
 from core.restful import Resource
+from docs.apidocs.cost_audit import (
+    app_cost_audit_spec,
+    stat_cost_audit_spec,
+    app_statistics_spec,
+    calc_and_save_app_statistics_spec,
+    daily_app_statistics_spec,
+    cache_app_statistics_for_periods_spec,
+    get_app_statistics_by_period_spec,
+    query_app_statistics_spec,
+    query_conversations_spec,
+)
 from libs.login import login_required
 from parts.urls import api
 
@@ -28,6 +40,7 @@ from .service import CATEGORY_TYPES, CostService
 
 class AppCostAudit(Resource):
     @login_required
+    @swag_from(app_cost_audit_spec)
     def get(self, app_id):
         """查询应用的成本审计信息。
 
@@ -60,6 +73,7 @@ class AppCostAudit(Resource):
 
 
 class StatCostAudit(Resource):
+    @swag_from(stat_cost_audit_spec)
     def get(self):
         """查询费用统计数据。
 
@@ -156,6 +170,7 @@ class StatCostAudit(Resource):
 
 class AppStatisticsApi(Resource):
     @login_required
+    @swag_from(app_statistics_spec)
     def post(self):
         """获取指定app_id的统计指标，优先从redis缓存读取。
 
@@ -182,6 +197,7 @@ class AppStatisticsApi(Resource):
 
 class CalcAndSaveAppStatisticsApi(Resource):
     @login_required
+    @swag_from(calc_and_save_app_statistics_spec)
     def post(self):
         """统计指定app_id下的各类指标，并存入AppStatistics表。
 
@@ -237,6 +253,7 @@ class CalcAndSaveAppStatisticsApi(Resource):
 
 class DailyAppStatisticsApi(Resource):
     @login_required
+    @swag_from(daily_app_statistics_spec)
     def post(self):
         """遍历所有app_id，统计指定日期的数据并存入AppStatistics表。
 
@@ -267,6 +284,7 @@ class DailyAppStatisticsApi(Resource):
 
 class CacheAppStatisticsForPeriodsApi(Resource):
     @login_required
+    @swag_from(cache_app_statistics_for_periods_spec)
     def post(self):
         """遍历所有app_id，统计近7天、近30天的数据并缓存到redis。
 
@@ -297,6 +315,7 @@ class CacheAppStatisticsForPeriodsApi(Resource):
 
 class GetAppStatisticsByPeriodApi(Resource):
     @login_required
+    @swag_from(get_app_statistics_by_period_spec)
     def post(self):
         """获取指定app_id和时间区间的统计数据，优先从redis获取，未命中则实时统计。
 
@@ -333,6 +352,7 @@ class GetAppStatisticsByPeriodApi(Resource):
 
 class QueryAppStatisticsApi(Resource):
     @login_required
+    @swag_from(query_app_statistics_spec)
     def post(self):
         """查询AppStatistics表，支持按app_id、时间区间、call_type过滤。
 
@@ -370,6 +390,7 @@ class QueryAppStatisticsApi(Resource):
 
 class QueryConversationsApi(Resource):
     @login_required
+    @swag_from(query_conversations_spec)
     def post(self):
         """查询Conversation表，支持按app_id、时间区间、from_who过滤。
 

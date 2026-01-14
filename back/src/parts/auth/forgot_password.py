@@ -42,13 +42,21 @@ import os
 import secrets
 from typing import Dict, Any, Optional
 
+from flasgger import swag_from
 from flask import request
 from flask_login import current_user
 from flask_restful import reqparse
 
 from core.account_manager import AccountService
 from core.restful import Resource
+from docs.apidocs.auth import (
+    forgot_password_send_email_spec,
+    forgot_password_check_spec,
+    forgot_password_reset_spec,
+    forgot_password_admin_reset_spec,
+)
 from libs.helper import email as email_validate
+from libs.login import login_required
 from libs.password import hash_password
 from models.model_account import Account
 from parts.logs import Action, LogService, Module
@@ -127,6 +135,7 @@ class PasswordHasher:
 class ForgotPasswordSendEmailApi(Resource):
     """发送密码重置邮件API"""
 
+    @swag_from(forgot_password_send_email_spec)
     def post(self) -> Dict[str, Any]:
         """
         发送密码重置邮件。
@@ -221,6 +230,7 @@ class ForgotPasswordSendEmailApi(Resource):
 class ForgotPasswordCheckApi(Resource):
     """验证密码重置令牌API"""
 
+    @swag_from(forgot_password_check_spec)
     def post(self) -> Dict[str, Any]:
         """
         验证密码重置令牌的有效性。
@@ -281,6 +291,7 @@ class ForgotPasswordCheckApi(Resource):
 class ForgotPasswordResetApi(Resource):
     """执行密码重置API"""
 
+    @swag_from(forgot_password_reset_spec)
     def post(self) -> Dict[str, str]:
         """
         重置用户密码。
@@ -440,6 +451,8 @@ class ForgotPasswordResetApi(Resource):
 class ForgotPasswordAdminResetApi(Resource):
     """管理员强制密码重置API"""
 
+    @login_required
+    @swag_from(forgot_password_admin_reset_spec)
     def post(self) -> Dict[str, str]:
         """
         管理员强制重置用户密码。

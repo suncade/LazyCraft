@@ -13,10 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from flasgger import swag_from
 from flask import request
 from flask_restful import reqparse
 
 from core.restful import Resource
+from docs.apidocs.prompt import (
+    prompt_create_spec,
+    prompt_get_spec,
+    prompt_update_spec,
+    prompt_delete_spec,
+    prompt_list_spec,
+)
 from libs.helper import build_response
 from libs.login import login_required
 from parts.urls import api
@@ -36,6 +44,7 @@ class CreatePrompt(Resource):
         self.prompt_service = PromptService()
 
     @login_required
+    @swag_from(prompt_create_spec)
     def post(self):
         """创建新的提示信息。
 
@@ -84,6 +93,7 @@ class GetPrompt(Resource):
         self.prompt_service = PromptService()
 
     @login_required
+    @swag_from(prompt_get_spec)
     def get(self, id):
         """获取指定ID的提示信息。
 
@@ -128,6 +138,7 @@ class UpdatePrompt(Resource):
         self.prompt_service = PromptService()
 
     @login_required
+    @swag_from(prompt_update_spec)
     def post(self, id):
         """
         处理POST请求，更新指定ID的提示信息。
@@ -176,6 +187,7 @@ class DeletePrompt(Resource):
         self.prompt_service = PromptService()
 
     @login_required
+    @swag_from(prompt_delete_spec)
     def post(self, id):
         """
         处理POST请求，删除指定ID的提示信息。
@@ -209,6 +221,7 @@ class ListPrompts(Resource):
         self.prompt_service = PromptService()
 
     @login_required
+    @swag_from(prompt_list_spec)
     def post(self):
         """
         处理GET请求，分页获取所有提示信息。

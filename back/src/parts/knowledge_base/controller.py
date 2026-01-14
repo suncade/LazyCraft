@@ -18,12 +18,26 @@ import urllib.parse
 import zipfile
 from io import BytesIO
 
+from flasgger import swag_from
 from flask import request, send_file
 from flask_login import current_user
 from flask_restful import marshal, reqparse
 
 from core.file_service import FileService
 from core.restful import Resource
+from docs.apidocs.knowledge_base import (
+    knowledge_base_list_spec,
+    knowledge_base_create_spec,
+    knowledge_base_update_spec,
+    knowledge_base_delete_spec,
+    file_upload_spec,
+    file_get_spec,
+    file_download_spec,
+    knowledge_base_add_file_spec,
+    knowledge_base_file_list_spec,
+    knowledge_base_file_delete_spec,
+    knowledge_base_reference_result_spec,
+)
 from libs.filetools import FileTools
 from libs.login import login_required
 from parts.logs import Action, LogService, Module
@@ -41,6 +55,7 @@ class KnowledgeBaseListApi(Resource):
     """
 
     @login_required
+    @swag_from(knowledge_base_list_spec)
     def post(self):
         """获取知识库列表。
 
@@ -77,6 +92,7 @@ class KnowledgeBaseCreateApi(Resource):
     """
 
     @login_required
+    @swag_from(knowledge_base_create_spec)
     def post(self):
         """创建空的知识库。
 
@@ -109,6 +125,7 @@ class KnowledgeBaseUpdateApi(Resource):
     """
 
     @login_required
+    @swag_from(knowledge_base_update_spec)
     def post(self):
         """修改知识库。
 
@@ -146,6 +163,7 @@ class KnowledgeBaseDeleteApi(Resource):
     """
 
     @login_required
+    @swag_from(knowledge_base_delete_spec)
     def post(self):
         """删除知识库。
 
@@ -182,6 +200,7 @@ class FileGetApi(Resource):
     """
 
     @login_required
+    @swag_from(file_get_spec)
     def post(self):
         """获取单个文件详情。
 
@@ -206,6 +225,7 @@ class FileUploadApi(Resource):
     """
 
     @login_required
+    @swag_from(file_upload_spec)
     def post(self):
         """上传单个文件。
 
@@ -274,6 +294,7 @@ class KnowledgeBaseAddFileApi(Resource):
     """
 
     @login_required
+    @swag_from(knowledge_base_add_file_spec)
     def post(self):
         """往知识库添加文件。
 
@@ -310,6 +331,7 @@ class KnowledgeBaseFileListApi(Resource):
     """
 
     @login_required
+    @swag_from(knowledge_base_file_list_spec)
     def get(self):
         """获取知识库详情与文件列表。
 
@@ -344,6 +366,7 @@ class KnowledgeBaseFileDeleteApi(Resource):
     """
 
     @login_required
+    @swag_from(knowledge_base_file_delete_spec)
     def post(self):
         """批量删除文件。
 
@@ -383,6 +406,7 @@ class FileDownloadApi(Resource):
     提供下载单个或多个文件的 RESTful 接口
     """
 
+    @swag_from(file_download_spec)
     def post(self):
         """下载单个或多个文件。
 
@@ -421,6 +445,7 @@ class FileDownloadApi(Resource):
 
 class KnowledgeBaseReferenceResult(Resource):
     @login_required
+    @swag_from(knowledge_base_reference_result_spec)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument("id", type=str, location="args")

@@ -18,6 +18,7 @@ import logging
 import uuid
 from collections import OrderedDict
 
+from flasgger import swag_from
 from flask import Response, request, stream_with_context
 from flask_restful import inputs, marshal, reqparse
 from sqlalchemy.sql import func
@@ -26,6 +27,13 @@ from lazyllm.engine import LightEngine
 
 import parts.data.data_reflux_service as reflux
 from core.restful import Resource as OldResource
+from docs.apidocs.conversation import (
+    speak_init_spec,
+    speak_sessions_spec,
+    speak_history_spec,
+    speak_to_app_spec,
+    speak_feedback_spec,
+)
 from libs.passport import PassportService
 from parts.app.app_service import AppService
 from parts.app.node_run.app_run_service import AppRunService, EventHandler
@@ -67,6 +75,7 @@ class SpeakInitApi(Resource):
     用于初始化用户身份和获取认证令牌。
     """
 
+    @swag_from(speak_init_spec)
     def get(self, app_id):
         """换取用户信息。
 
@@ -100,6 +109,7 @@ class SpeakSessionsApi(Resource):
     用于获取用户的对话会话列表。
     """
 
+    @swag_from(speak_sessions_spec)
     def get(self, app_id):
         """获取会话列表。
 
@@ -145,6 +155,7 @@ class SpeakHistoryApi(Resource):
     用于获取特定会话的历史对话记录。
     """
 
+    @swag_from(speak_history_spec)
     def get(self, app_id):
         """获取某个会话的历史记录。
 
@@ -182,6 +193,7 @@ class SpeakToAppApi(Resource):
     用于与应用程序进行对话交互。
     """
 
+    @swag_from(speak_to_app_spec)
     def post(self, app_id):
         """跟app对话。
 
@@ -317,6 +329,7 @@ class SpeakFeedbackApi(Resource):
     用于对对话结果进行用户反馈。
     """
 
+    @swag_from(speak_feedback_spec)
     def post(self, app_id):
         """对对话的结果进行反馈。
 

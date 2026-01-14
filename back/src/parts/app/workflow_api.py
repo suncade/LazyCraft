@@ -17,6 +17,7 @@ import json
 import re
 from datetime import datetime, timezone
 
+from flasgger import swag_from
 from flask import Response, abort, request, stream_with_context
 from flask_login import current_user
 from flask_restful import marshal, reqparse
@@ -26,6 +27,28 @@ from lazyllm.engine.engine import setup_deploy_method
 from lazyllm.tools.rag.utils import DocListManager
 
 from core.restful import Resource
+from docs.apidocs.app import (
+    draft_workflow_spec,
+    draft_workflow_post_spec,
+    draft_workflow_status_spec,
+    draft_workflow_start_spec,
+    draft_workflow_run_spec,
+    draft_workflow_stop_spec,
+    draft_workflow_reset_session_spec,
+    published_workflow_spec,
+    published_workflow_post_spec,
+    cancel_publish_spec,
+    node_run_stream_spec,
+    new_workflow_from_empty_spec,
+    new_workflow_from_app_spec,
+    new_workflow_from_template_spec,
+    workflow_add_log_spec,
+    workflow_batch_log_spec,
+    doc_parse_spec,
+    doc_parse_status_spec,
+    ai_code_assistant_spec,
+    ai_prompt_assistant_spec,
+)
 from libs import helper
 from libs.feature_gate import require_internet_feature
 from libs.http_exception import BaseHTTPError
@@ -60,6 +83,7 @@ class DraftWorkflowNotSync(BaseHTTPError):
 
 class DraftWorkflowApi(Resource):
     @login_required
+    @swag_from(draft_workflow_spec)
     def get(self, app_id):
         """获取草稿工作流。
 
@@ -88,6 +112,7 @@ class DraftWorkflowApi(Resource):
         return workflow_dict
 
     @login_required
+    @swag_from(draft_workflow_post_spec)
     def post(self, app_id):
         """同步草稿工作流。
 
@@ -162,6 +187,7 @@ class DraftWorkflowApi(Resource):
 
 class DraftWorkflowStatusApi(Resource):
     @login_required
+    @swag_from(draft_workflow_status_spec)
     def get(self, app_id):
         """查询草稿调试的状态"""
         app_model = AppService().get_app(app_id, raise_error=False)
@@ -177,6 +203,7 @@ class DraftWorkflowStatusApi(Resource):
 class DraftWorkflowStartApi(Resource):
     @login_required
     @require_internet_feature("应用调试启动")
+    @swag_from(draft_workflow_start_spec)
     def post(self, app_id):
         """开始草稿调试"""
         workflow = WorkflowService().get_draft_workflow(app_id)
@@ -207,6 +234,7 @@ class DraftWorkflowStartApi(Resource):
 class DraftWorkflowRunApi(Resource):
     @login_required
     @require_internet_feature("应用预览运行")
+    @swag_from(draft_workflow_run_spec)
     def post(self, app_id):
         """运行草稿调试"""
         parser = reqparse.RequestParser()
@@ -237,6 +265,7 @@ class DraftWorkflowRunApi(Resource):
 
 class DraftWorkflowStopApi(Resource):
     @login_required
+    @swag_from(draft_workflow_stop_spec)
     def post(self, app_id):
         """结束草稿调试"""
         workflow = WorkflowService().get_draft_workflow(app_id)
@@ -266,6 +295,7 @@ class DraftWorkflowStopApi(Resource):
 
 class DraftWorkflowResetSessionApi(Resource):
     @login_required
+    @swag_from(draft_workflow_reset_session_spec)
     def post(self, app_id):
         """重置调试会话"""
         app_model = AppService().get_app(app_id, raise_error=False)
@@ -288,6 +318,7 @@ class DraftWorkflowResetSessionApi(Resource):
 class NodeRunStreamApi(Resource):
     @login_required
     @require_internet_feature("节点运行")
+    @swag_from(node_run_stream_spec)
     def post(self, app_id, node_id):
         """运行单节点调试(流式输出)"""
         parser = reqparse.RequestParser()
@@ -329,6 +360,7 @@ class NodeRunStreamApi(Resource):
 
 class PublishedWorkflowApi(Resource):
     @login_required
+    @swag_from(published_workflow_spec)
     def get(self, app_id):
         """Get published workflow"""
         app_model = AppService().get_app(app_id)
@@ -343,6 +375,7 @@ class PublishedWorkflowApi(Resource):
 
     @login_required
     @require_internet_feature("应用发布")
+    @swag_from(published_workflow_post_spec)
     def post(self, app_id):
         """Publish workflow"""
         parser = reqparse.RequestParser()
@@ -373,6 +406,7 @@ class PublishedWorkflowApi(Resource):
 
 class CancelPublishApi(Resource):
     @login_required
+    @swag_from(cancel_publish_spec)
     def post(self, app_id):
         """cancel publish workflow"""
 
@@ -401,6 +435,7 @@ class CancelPublishApi(Resource):
 
 class NewWorkflowFromEmpty(Resource):
     @login_required
+    @swag_from(new_workflow_from_empty_spec)
     def post(self):
         """创建空白workflow"""
         self.check_can_write()
@@ -412,6 +447,7 @@ class NewWorkflowFromEmpty(Resource):
 
 class NewWorkflowFromApp(Resource):
     @login_required
+    @swag_from(new_workflow_from_app_spec)
     def post(self):
         """拖拽app创建新的流程"""
         parser = reqparse.RequestParser()
@@ -456,6 +492,7 @@ class NewWorkflowFromApp(Resource):
 
 class NewWorkflowFromTemplate(Resource):
     @login_required
+    @swag_from(new_workflow_from_template_spec)
     def post(self):
         """拖拽template创建新的流程"""
         parser = reqparse.RequestParser()
@@ -483,6 +520,7 @@ class NewWorkflowFromTemplate(Resource):
 
 class WorkflowAddLog(Resource):
     @login_required
+    @swag_from(workflow_add_log_spec)
     def post(self):
         """添加(删除)资源(节点)时上报的日志"""
         parser = reqparse.RequestParser()
@@ -522,6 +560,7 @@ class WorkflowAddLog(Resource):
 class WorkflowBatchLog(Resource):
     @login_required
     @require_internet_feature("批量运行")
+    @swag_from(workflow_batch_log_spec)
     def post(self):
         """批量调试时上报的结果日志"""
         parser = reqparse.RequestParser()
@@ -565,6 +604,7 @@ class WorkflowBatchLog(Resource):
 class DocParseApi(Resource):
     @login_required
     @require_internet_feature("知识库数据解析")
+    @swag_from(doc_parse_spec)
     def post(self, app_id, doc_id):
         """Document节点数据解析"""
         parser = reqparse.RequestParser()
@@ -625,8 +665,8 @@ class DocParseApi(Resource):
 
 
 class DocParseStatusApi(Resource):
-
     @login_required
+    @swag_from(doc_parse_status_spec)
     def post(self, app_id, doc_id):
         """查询Document节点数据解析状态"""
         parser = reqparse.RequestParser()
@@ -651,6 +691,7 @@ class DocParseStatusApi(Resource):
 
 class AICodeAssistant(Resource):
     @login_required
+    @swag_from(ai_code_assistant_spec)
     def post(self):
         """该函数用于处理AI代码助手的POST请求
 
@@ -795,6 +836,7 @@ class AICodeAssistant(Resource):
 
 class AIPromptAssistant(Resource):
     @login_required
+    @swag_from(ai_prompt_assistant_spec)
     def post(self):
         """处理AI提示语助手的POST请求。
 

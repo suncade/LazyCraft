@@ -15,10 +15,12 @@
 
 from datetime import datetime, time, timedelta
 
+from flasgger import swag_from
 from flask import request
 from flask_login import current_user
 
 from core.restful import Resource
+from docs.apidocs.logs import log_list_spec
 from libs.helper import build_response
 from libs.login import login_required
 from libs.timetools import TimeTools
@@ -30,6 +32,7 @@ from .service import LogService
 class LogsController(Resource):
 
     @login_required
+    @swag_from(log_list_spec)
     def get(self):
         """查询用户的操作日志。
 

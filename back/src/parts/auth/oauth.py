@@ -19,10 +19,16 @@ import os
 from urllib.parse import urljoin
 
 import requests
+from flasgger import swag_from
 from flask import current_app, redirect, request
 from flask_restful import Resource, reqparse
 
 from core.account_manager import AccountService, RegisterService, TenantService
+from docs.apidocs.auth import (
+    oauth_login_spec,
+    oauth_authorize_get_spec,
+    oauth_authorize_post_spec,
+)
 from libs.helper import get_remote_ip
 from libs.oauth import GitHubOAuth
 from models.model_account import Account
@@ -67,6 +73,7 @@ def get_oauth_providers():
 
 
 class OAuthLogin(Resource):
+    @swag_from(oauth_login_spec)
     def get(self, provider: str):
         """启动OAuth登录流程。
 
@@ -95,6 +102,7 @@ class OAuthPostHandle(Resource):
 
     github_oauth_template = "github_oauth:{}"
 
+    @swag_from(oauth_authorize_get_spec)
     def get(self, provider: str):
         """处理OAuth回调请求。
 
@@ -152,6 +160,7 @@ class OAuthPostHandle(Resource):
             # 自动登录
             return redirect(f"{CONSOLE_WEB_URL}?console_token={token}")
 
+    @swag_from(oauth_authorize_post_spec)
     def post(self, provider: str):
         """完成OAuth账号与手机号绑定。
 

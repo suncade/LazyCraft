@@ -13,10 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from flasgger import swag_from
 from flask import request
 from flask_login import current_user
 from flask_restful import Resource, reqparse
 
+from docs.apidocs.message import (
+    notification_create_spec,
+    notification_list_spec,
+    notification_read_spec,
+    notification_detail_spec,
+)
 from libs.login import login_required
 from parts.urls import api
 
@@ -31,6 +38,7 @@ class NotificationCreateApi(Resource):
     """
 
     @login_required
+    @swag_from(notification_create_spec)
     def post(self):
         """创建新的通知。
 
@@ -72,6 +80,7 @@ class NotificationListApi(Resource):
     """
 
     @login_required
+    @swag_from(notification_list_spec)
     def post(self):
         """获取通知列表。
 
@@ -141,6 +150,7 @@ class NotificationReadApi(Resource):
     """
 
     @login_required
+    @swag_from(notification_read_spec)
     def post(self):
         """标记通知为已读。
 
@@ -178,6 +188,7 @@ class NotificationDetailApi(Resource):
     """
 
     @login_required
+    @swag_from(notification_detail_spec)
     def get(self):
         """获取通知详情。
 

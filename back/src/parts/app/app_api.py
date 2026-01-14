@@ -20,6 +20,7 @@ import tempfile
 import time
 from datetime import datetime
 
+from flasgger import swag_from
 from flask import Response, request, send_from_directory, stream_with_context
 from flask_login import current_user
 from flask_restful import inputs, marshal, marshal_with, reqparse
@@ -29,6 +30,37 @@ from lazyllm.engine import LightEngine
 
 import parts.data.data_reflux_service as reflux
 from core.restful import Resource
+from docs.apidocs.app import (
+    app_list_spec,
+    app_list_page_spec,
+    app_detail_get_spec,
+    app_detail_put_spec,
+    app_detail_delete_spec,
+    app_create_spec,
+    app_enable_api_spec,
+    app_enable_backflow_spec,
+    app_enable_api_call_spec,
+    app_export_spec,
+    app_import_spec,
+    app_convert_to_template_spec,
+    template_list_spec,
+    template_detail_spec,
+    template_detail_put_spec,
+    template_detail_delete_spec,
+    template_convert_to_app_spec,
+    app_report_spec,
+    app_version_spec,
+    app_restore_spec,
+    check_versions_count_spec,
+    reference_result_spec,
+    draft_import_from_file_spec,
+    draft_debug_detail_spec,
+    draft_debug_detail_stream_spec,
+    draft_debug_detail_history_spec,
+    draft_debug_detail_history_delete_spec,
+    draft_debug_detail_stream_stop_spec,
+    draft_debug_detail_stream_status_spec,
+)
 from libs import helper
 from libs.feature_gate import require_internet_feature
 from libs.login import login_required
@@ -75,6 +107,7 @@ def get_create_app_parser():
 
 class AppListApi(Resource):
     @login_required
+    @swag_from(app_list_spec)
     def get(self):
         """获取应用列表。
 
@@ -137,6 +170,7 @@ class AppListApi(Resource):
 
     @login_required
     @marshal_with(fields.app_detail_fields)
+    @swag_from(app_create_spec)
     def post(self):
         """创建空白的应用。
 
@@ -168,6 +202,7 @@ class AppListApi(Resource):
 
 class AppListPageApi(Resource):
     @login_required
+    @swag_from(app_list_page_spec)
     def post(self):
         """获取应用列表（分页版本）。
 
@@ -235,6 +270,7 @@ class AppListPageApi(Resource):
 
 class AppDetailApi(Resource):
     @login_required
+    @swag_from(app_detail_get_spec)
     def get(self, app_id):
         """获取应用详情。
 
@@ -255,6 +291,7 @@ class AppDetailApi(Resource):
         return marshal(app_model, fields.app_detail_fields)
 
     @login_required
+    @swag_from(app_detail_put_spec)
     def put(self, app_id):
         """更新应用信息。
 
@@ -288,6 +325,7 @@ class AppDetailApi(Resource):
         return marshal(app_model, fields.app_detail_fields)
 
     @login_required
+    @swag_from(app_detail_delete_spec)
     def delete(self, app_id):
         """删除应用。
 
@@ -317,6 +355,7 @@ class AppDetailApi(Resource):
 class AppEnableApi(Resource):
     @login_required
     @require_internet_feature("应用服务启停")
+    @swag_from(app_enable_api_spec)
     def post(self, app_id):
         """启用或禁用应用服务。
 
@@ -401,6 +440,7 @@ class AppEnableApi(Resource):
 
 class AppEnableBackflow(Resource):
     @login_required
+    @swag_from(app_enable_backflow_spec)
     def post(self, app_id):
         """启用或禁用数据回流功能。
 
@@ -433,6 +473,7 @@ class AppEnableBackflow(Resource):
 
 class AppConvertToTemplate(Resource):
     @login_required
+    @swag_from(app_convert_to_template_spec)
     def post(self):
         """将应用转换为模板。
 
@@ -476,6 +517,7 @@ class AppConvertToTemplate(Resource):
 
 class AppExportApi(Resource):
     @login_required
+    @swag_from(app_export_spec)
     def get(self, app_id):
         """导出应用配置。
 
@@ -522,6 +564,7 @@ class AppExportApi(Resource):
 
 class AppImportFromFile(Resource):
     @login_required
+    @swag_from(app_import_spec)
     def post(self):
         """从文件导入应用。
 
@@ -568,6 +611,7 @@ class AppImportFromFile(Resource):
 
 class DraftImportFromFile(Resource):
     @login_required
+    @swag_from(draft_import_from_file_spec)
     def post(self, app_id):
         """从文件导入工作流到草稿。
 
@@ -599,6 +643,7 @@ class DraftImportFromFile(Resource):
 
 class TemplateListApi(Resource):
     @login_required
+    @swag_from(template_list_spec)
     def get(self):
         """获取模板列表。
 
@@ -647,6 +692,7 @@ class TemplateListApi(Resource):
 
 class TemplateDetailApi(Resource):
     @login_required
+    @swag_from(template_detail_spec)
     def get(self, app_id):
         """获取模板详情。
 
@@ -664,6 +710,7 @@ class TemplateDetailApi(Resource):
         return marshal(template, fields.app_detail_fields)
 
     @login_required
+    @swag_from(template_detail_put_spec)
     def put(self, app_id):
         """更新模板信息。
 
@@ -695,6 +742,7 @@ class TemplateDetailApi(Resource):
         return marshal(template, fields.app_detail_fields)
 
     @login_required
+    @swag_from(template_detail_delete_spec)
     def delete(self, app_id):
         """删除模板。
 
@@ -718,6 +766,7 @@ class TemplateDetailApi(Resource):
 class TemplateConvertToApp(Resource):
     @login_required
     @marshal_with(fields.app_detail_fields)
+    @swag_from(template_convert_to_app_spec)
     def post(self):
         """将模板转换为应用。
 
@@ -756,6 +805,7 @@ class TemplateConvertToApp(Resource):
 
 class AppReportApi(Resource):
     # 该接口不允许登录
+    @swag_from(app_report_spec)
     def post(self):
         """接收引擎报告回调数据。
 
@@ -861,7 +911,7 @@ class AppReportApi(Resource):
 
 
 class DraftDebugDetailApi(Resource):
-
+    @swag_from(draft_debug_detail_spec)
     def get(self, app_id, mode="draft"):
         """获取调试详情信息。
 
@@ -894,6 +944,7 @@ class DraftDebugDetailApi(Resource):
 
 class AppEnableApiCall(Resource):
     @login_required
+    @swag_from(app_enable_api_call_spec)
     def post(self, app_id):
         """启用或禁用API调用功能。
 
@@ -1014,6 +1065,7 @@ class SSEStreamManager:
 
 
 class DraftDebugDetailStreamApi(Resource):
+    @swag_from(draft_debug_detail_stream_spec)
     def get(self, app_id, mode="draft"):
         """实时SSE推送逐步调试信息。
 
@@ -1142,6 +1194,7 @@ class DraftDebugDetailStreamApi(Resource):
 
 
 class DraftDebugDetailHistoryApi(Resource):
+    @swag_from(draft_debug_detail_history_spec)
     def get(self, app_id, mode="draft"):
         """获取历史逐步调试信息。
 
@@ -1171,6 +1224,7 @@ class DraftDebugDetailHistoryApi(Resource):
 
 
 class DraftDebugDetailHistoryDeleteApi(Resource):
+    @swag_from(draft_debug_detail_history_delete_spec)
     def delete(self, app_id, mode="draft"):
         """删除历史逐步调试信息。
 
@@ -1190,6 +1244,7 @@ class DraftDebugDetailHistoryDeleteApi(Resource):
 
 
 class AppVersion(Resource):
+    @swag_from(app_version_spec)
     def get(self, app_id):
         app_versions = AppService().get_app_versions(app_id)
         return marshal(app_versions, fields.app_versions_fields)
@@ -1197,6 +1252,7 @@ class AppVersion(Resource):
 
 class CheckVersionsCount(Resource):
     @login_required
+    @swag_from(check_versions_count_spec)
     def get(self, app_id):
         app_model = AppService().get_app(app_id, raise_error=False)
         if app_model:
@@ -1211,6 +1267,7 @@ class CheckVersionsCount(Resource):
 
 
 class AppRestore(Resource):
+    @swag_from(app_restore_spec)
     def post(self, app_id):
         parser = reqparse.RequestParser()
         parser.add_argument("version", required=True, type=str, location="json")
@@ -1238,6 +1295,7 @@ class AppRestore(Resource):
 
 
 class ReferenceResult(Resource):
+    @swag_from(reference_result_spec)
     def get(self, app_id):
         app = AppService().get_app(app_id)
         if not app.enable_api:
@@ -1248,6 +1306,7 @@ class ReferenceResult(Resource):
 
 
 class DraftDebugDetailStreamStopApi(Resource):
+    @swag_from(draft_debug_detail_stream_stop_spec)
     def post(self, app_id, mode="draft"):
         """远程停止SSE流。
 
@@ -1287,6 +1346,7 @@ class DraftDebugDetailStreamStopApi(Resource):
 
 
 class DraftDebugDetailStreamStatusApi(Resource):
+    @swag_from(draft_debug_detail_stream_status_spec)
     def get(self, app_id, mode="draft"):
         """获取SSE流连接状态。
 

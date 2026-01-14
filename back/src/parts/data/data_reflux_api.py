@@ -17,10 +17,23 @@ import mimetypes
 import os
 import urllib.parse
 
+from flasgger import swag_from
 from flask import jsonify, request, send_file
 from flask_login import current_user
 from flask_restful import Resource, marshal, reqparse
 
+from docs.apidocs.data import (
+    reflux_app_publish_spec,
+    reflux_data_create_spec,
+    reflux_data_update_feedback_spec,
+    reflux_data_set_version_publish_spec,
+    reflux_data_list_spec,
+    reflux_data_detail_spec,
+    reflux_data_delete_spec,
+    reflux_data_update_spec,
+    reflux_data_set_version_export_spec,
+    reflux_data_set_version_export_for_ft_spec,
+)
 from libs.login import login_required
 from parts.urls import api
 
@@ -42,6 +55,7 @@ class RefluxAppPublishApi(Resource):
     """
 
     @login_required
+    @swag_from(reflux_app_publish_spec)
     def post(self):
         """发布应用回流数据。
 
@@ -81,6 +95,7 @@ class RefluxDataCreateApi(Resource):
     """
 
     @login_required
+    @swag_from(reflux_data_create_spec)
     def post(self):
         """创建回流数据。
 
@@ -110,6 +125,7 @@ class RefluxDataUpdateFeedbackApi(Resource):
     """
 
     # @login_required
+    @swag_from(reflux_data_update_feedback_spec)
     def post(self):
         """更新回流数据反馈。
 
@@ -137,6 +153,7 @@ class RefluxDataSetVersionPublishApi(Resource):
     """
 
     @login_required
+    @swag_from(reflux_data_set_version_publish_spec)
     def post(self):
         """发布数据集版本回流数据。
 
@@ -173,6 +190,7 @@ class RefluxDataListApi(Resource):
     """
 
     @login_required
+    @swag_from(reflux_data_list_spec)
     def get(self):
         """获取回流数据分页列表。
 
@@ -210,6 +228,7 @@ class RefluxDataDeleteApi(Resource):
     """
 
     @login_required
+    @swag_from(reflux_data_delete_spec)
     def post(self):
         """删除回流数据。
 
@@ -243,6 +262,7 @@ class RefluxDataDetailApi(Resource):
     """
 
     @login_required
+    @swag_from(reflux_data_detail_spec)
     def get(self):
         """获取回流数据详情。
 
@@ -280,6 +300,7 @@ class RefluxDataUpdateApi(Resource):
     """
 
     @login_required
+    @swag_from(reflux_data_update_spec)
     def post(self):
         """修改回流数据。
 
@@ -314,6 +335,7 @@ class RefluxDataSetVersionExport(Resource):
     """
 
     @login_required
+    @swag_from(reflux_data_set_version_export_spec)
     def post(self):
         """导出数据集版本。
 
@@ -359,6 +381,7 @@ class RefluxDataSetVersionExportForFT(Resource):
     """
 
     # @login_required
+    @swag_from(reflux_data_set_version_export_for_ft_spec)
     def get(self):
         """导出数据集版本（用于微调）。
 

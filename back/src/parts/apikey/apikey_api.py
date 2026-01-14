@@ -15,6 +15,7 @@
 
 import time
 
+from flasgger import swag_from
 from flask import request
 from flask_login import current_user
 from flask_restful import marshal, reqparse
@@ -23,6 +24,13 @@ from lazyllm.engine import LightEngine
 
 from core.account_manager import AccountService, TenantService
 from core.restful import Resource
+from docs.apidocs.apikey import (
+    apikey_list_spec,
+    apikey_create_spec,
+    apikey_delete_spec,
+    apikey_update_spec,
+    apikey_chat_spec,
+)
 from libs.login import login_required
 from models.model_account import Tenant
 from parts.apikey.apikey_service import ApikeyService
@@ -37,6 +45,7 @@ from . import fields
 
 class ApikeyApi(Resource):
     @login_required
+    @swag_from(apikey_list_spec)
     def get(self):
         """获取当前用户的所有API Key列表。
 
@@ -67,6 +76,7 @@ class ApikeyApi(Resource):
         return marshal(result, fields.apikey_detail_fields)
 
     @login_required
+    @swag_from(apikey_create_spec)
     def post(self):
         """创建新的API Key。
 
@@ -116,6 +126,7 @@ class ApikeyApi(Resource):
         return marshal(result, fields.apikey_detail_fields)
 
     @login_required
+    @swag_from(apikey_delete_spec)
     def delete(self):
         """删除指定的API Key。
 
@@ -144,6 +155,7 @@ class ApikeyApi(Resource):
         return {"result": "success"}, 204
 
     @login_required
+    @swag_from(apikey_update_spec)
     def put(self):
         """更新API Key的状态。
 
@@ -190,6 +202,7 @@ class ApikeyChat(Resource):
         """
         return self.api_key_info.user_id
 
+    @swag_from(apikey_chat_spec)
     def post(self, app_id):
         """使用API Key与指定应用进行对话。
 

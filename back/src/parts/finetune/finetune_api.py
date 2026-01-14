@@ -15,12 +15,31 @@
 
 import threading
 
+from flasgger import swag_from
 from flask import Response, current_app, g, request
 from flask_login import current_user
 from flask_restful import inputs, marshal, reqparse
 
 from core.restful import Resource
 from core.account_manager import CommonError
+from docs.apidocs.finetune import (
+    finetune_create_spec,
+    finetune_list_page_spec,
+    finetune_delete_spec,
+    finetune_cancel_spec,
+    finetune_detail_spec,
+    finetune_start_spec,
+    finetune_pause_spec,
+    finetune_resume_spec,
+    finetune_running_metrics_spec,
+    finetune_model_spec,
+    finetune_dataset_spec,
+    finetune_custom_param_get_spec,
+    finetune_custom_param_post_spec,
+    finetune_custom_param_delete_spec,
+    finetune_log_spec,
+    finetune_ft_model_spec,
+)
 from libs.feature_gate import require_internet_feature
 from libs.login import login_required
 from parts.finetune.finetune_service import FinetuneService
@@ -38,6 +57,7 @@ from .schema import FinetuneCreateSchema
 class FinetuneListApi(Resource):
     @login_required
     @require_internet_feature("发布模型微调")
+    @swag_from(finetune_create_spec)
     def post(self):
         """创建微调任务。
 
@@ -91,6 +111,7 @@ class FinetuneListApi(Resource):
 
 class FinetuneListPageApi(Resource):
     @login_required
+    @swag_from(finetune_list_page_spec)
     def post(self):
         """获取微调任务分页列表。
 
@@ -160,6 +181,7 @@ class FinetuneListPageApi(Resource):
 class FinetuneDeleteApi(Resource):
 
     @login_required
+    @swag_from(finetune_delete_spec)
     def delete(self, task_id):
         """删除微调任务。
 
@@ -195,6 +217,7 @@ class FinetuneDeleteApi(Resource):
 
 class FinetuneCancelApi(Resource):
     @login_required
+    @swag_from(finetune_cancel_spec)
     def delete(self, task_id):
         """取消微调任务。
 
@@ -230,6 +253,7 @@ class FinetuneCancelApi(Resource):
 
 class FinetuneDetailApi(Resource):
     @login_required
+    @swag_from(finetune_detail_spec)
     def get(self, task_id):
         """获取微调任务详细信息。
 
@@ -259,6 +283,7 @@ class FinetuneDetailApi(Resource):
 
 class FinetuneCustomParamApi(Resource):
     @login_required
+    @swag_from(finetune_custom_param_get_spec)
     def get(self):
         """获取自定义参数列表。
 
@@ -276,6 +301,7 @@ class FinetuneCustomParamApi(Resource):
         return marshal(list, fields.finetune_param_fields)
 
     @login_required
+    @swag_from(finetune_custom_param_post_spec)
     def post(self):
         """保存自定义参数。
 
@@ -298,6 +324,7 @@ class FinetuneCustomParamApi(Resource):
         return marshal(config, fields.finetune_param_fields)
 
     @login_required
+    @swag_from(finetune_custom_param_delete_spec)
     def delete(self):
         """删除自定义参数。
 
@@ -333,6 +360,7 @@ class FinetuneCustomParamApi(Resource):
 
 class FinetuneModelApi(Resource):
     @login_required
+    @swag_from(finetune_model_spec)
     def get(self):
         """获取可用于微调的模型列表。
 
@@ -373,6 +401,7 @@ class FinetuneModelApi(Resource):
 
 class FinetuneDatasetApi(Resource):
     @login_required
+    @swag_from(finetune_dataset_spec)
     def get(self):
         """获取可用于微调的数据集列表。
 
@@ -402,6 +431,7 @@ class FinetuneDatasetApi(Resource):
 
 class FinetuneLogApi(Resource):
     @login_required
+    @swag_from(finetune_log_spec)
     def get(self, task_id):
         """获取微调任务日志。
 
@@ -429,6 +459,7 @@ class FinetuneLogApi(Resource):
 
 class FinetuneStartApi(Resource):
     @login_required
+    @swag_from(finetune_start_spec)
     def get(self, task_id):
         """启动微调任务。
 
@@ -470,6 +501,7 @@ class FinetuneStartApi(Resource):
 
 class FinetunePauseApi(Resource):
     @login_required
+    @swag_from(finetune_pause_spec)
     def get(self, task_id):
         """暂停微调任务。
 
@@ -509,6 +541,7 @@ class FinetunePauseApi(Resource):
 
 class FinetuneResumeApi(Resource):
     @login_required
+    @swag_from(finetune_resume_spec)
     def get(self, task_id):
         """恢复微调任务。
 
@@ -548,6 +581,7 @@ class FinetuneResumeApi(Resource):
 
 class FinetuneRunningMetricsApi(Resource):
     @login_required
+    @swag_from(finetune_running_metrics_spec)
     def get(self, task_id):
         """获取微调任务运行指标。
 
@@ -583,6 +617,7 @@ class FinetuneRunningMetricsApi(Resource):
 
 class FinetuneFTModelApi(Resource):
     @login_required
+    @swag_from(finetune_ft_model_spec)
     def get(self):
         """获取FT模型列表。
 

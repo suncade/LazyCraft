@@ -18,11 +18,30 @@ from datetime import datetime
 from io import BytesIO
 
 import pandas as pd
+from flasgger import swag_from
 from flask import abort, request, send_file
 from flask_login import current_user
 from flask_restful import reqparse
 
 from core.restful import Resource
+from docs.apidocs.db_manage import (
+    database_create_spec,
+    database_list_spec,
+    database_update_spec,
+    database_delete_spec,
+    table_list_spec,
+    table_get_by_name_spec,
+    table_get_spec,
+    table_update_spec,
+    table_delete_spec,
+    table_create_spec,
+    data_import_template_spec,
+    data_import_preview_spec,
+    data_import_execute_spec,
+    table_data_list_spec,
+    table_data_update_spec,
+    table_data_delete_spec,
+)
 from libs.login import login_required
 from parts.urls import api
 from utils.util_database import db
@@ -50,6 +69,7 @@ class DBManageDatabaseBase(Resource):
 
     # 创建数据库
     @login_required
+    @swag_from(database_create_spec)
     def post(self):
         """创建新数据库。
 
@@ -93,6 +113,7 @@ class DBManageDatabaseBase(Resource):
 class DBManageDatabaseBaseList(Resource):
     # 获取所有数据库
     @login_required
+    @swag_from(database_list_spec)
     def post(self):
         """获取数据库列表（分页）。
 
@@ -141,6 +162,7 @@ class DBManageDatabaseBaseList(Resource):
 
 class DBManageDatabase(Resource):
     @login_required
+    @swag_from(database_update_spec)
     def put(self, database_id):
         """更新数据库信息。
 
@@ -181,6 +203,7 @@ class DBManageDatabase(Resource):
 
     # 删除数据库
     @login_required
+    @swag_from(database_delete_spec)
     def delete(self, database_id):
         """删除数据库。
 
@@ -211,6 +234,7 @@ class DBManageDatabase(Resource):
 class DBManageTableList(Resource):
     # 获取表结构
     @login_required
+    @swag_from(table_list_spec)
     def get(self, database_id):
         """获取数据库中的表列表。
 
@@ -259,6 +283,7 @@ class DBManageTableList(Resource):
 class DBManageTableByName(Resource):
     # 获取表结构
     @login_required
+    @swag_from(table_get_by_name_spec)
     def get(self, database_id, table_name):
         """根据表名获取表结构。
 
@@ -288,6 +313,7 @@ class DBManageTableByName(Resource):
 class DBManageTable(Resource):
     # 获取表结构
     @login_required
+    @swag_from(table_get_spec)
     def get(self, database_id, table_id):
         """根据表ID获取表结构。
 
@@ -316,6 +342,7 @@ class DBManageTable(Resource):
 
     # 编辑表结构
     @login_required
+    @swag_from(table_update_spec)
     def put(self, database_id, table_id):
         """编辑表结构。
 
@@ -369,6 +396,7 @@ class DBManageTable(Resource):
 
     # 删除表
     @login_required
+    @swag_from(table_delete_spec)
     def delete(self, database_id, table_id):
         """删除表。
 
@@ -404,6 +432,7 @@ class DBManageTable(Resource):
 class DBManageTableCreate(Resource):
     # 创建表结构
     @login_required
+    @swag_from(table_create_spec)
     def post(self, database_id):
         """创建新表。
 
@@ -459,6 +488,7 @@ class DBManageTableCreate(Resource):
 
 class DataImport(Resource):
 
+    @swag_from(data_import_template_spec)
     def get(self, database_id, table_id):
         """下载数据导入模板。
 
@@ -504,6 +534,7 @@ class DataImport(Resource):
             abort(400, message=f"Failed to generate template: {str(e)}")
 
     @login_required
+    @swag_from(data_import_preview_spec)
     def post(self, database_id, table_id):
         """上传并预览导入数据。
 
@@ -578,6 +609,7 @@ class DataImport(Resource):
             abort(400, message=f"Error processing file: {str(e)}")
 
     @login_required
+    @swag_from(data_import_execute_spec)
     def put(self, database_id, table_id):
         """执行数据导入。
 
@@ -632,6 +664,7 @@ class DataImport(Resource):
 
 class TableDataManager(Resource):
     @login_required
+    @swag_from(table_data_list_spec)
     def get(self, database_id, table_id):
         """获取表数据（分页）。
 
@@ -679,6 +712,7 @@ class TableDataManager(Resource):
         return page_data
 
     @login_required
+    @swag_from(table_data_update_spec)
     def put(self, database_id, table_id):
         """批量更新表数据。
 
@@ -737,6 +771,7 @@ class TableDataManager(Resource):
             return {"code": 400, "message": error[0]["error"]}, 400
 
     @login_required
+    @swag_from(table_data_delete_spec)
     def delete(self, database_id, table_id):
         """删除表数据。
 

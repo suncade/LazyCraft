@@ -18,6 +18,7 @@ import logging
 
 import httpx
 from anyio import BrokenResourceError
+from flasgger import swag_from
 from flask import Response, request, stream_with_context
 from flask_login import current_user
 from flask_restful import marshal, reqparse
@@ -25,6 +26,20 @@ from mcp import McpError
 from mcp.shared.exceptions import McpError as SharedMcpError
 
 from core.restful import Resource
+from docs.apidocs.mcp import (
+    server_list_spec,
+    server_detail_spec,
+    server_check_name_spec,
+    server_create_update_spec,
+    server_delete_spec,
+    server_publish_spec,
+    server_enable_spec,
+    server_sync_tools_spec,
+    tool_list_spec,
+    tool_detail_spec,
+    tool_test_spec,
+    tool_reference_result_spec,
+)
 from libs.login import login_required
 from parts.app.node_run.event_serializer import EventSerializer
 from parts.app.refer_service import ReferManager
@@ -38,6 +53,7 @@ from .service import McpServerService, McpToolService
 
 class McpServerListApi(Resource):
     @login_required
+    @swag_from(server_list_spec)
     def post(self):
         """获取MCP服务器分页列表。
 
@@ -87,6 +103,7 @@ class McpServerListApi(Resource):
 
 class McpServerDetailApi(Resource):
     @login_required
+    @swag_from(server_detail_spec)
     def get(self):
         """获取MCP服务器详细信息。
 
@@ -111,6 +128,7 @@ class McpServerDetailApi(Resource):
 
 class McpServerCheckName(Resource):
     @login_required
+    @swag_from(server_check_name_spec)
     def post(self):
         """检查MCP服务器名称是否已存在。
 
@@ -138,6 +156,7 @@ class McpServerCheckName(Resource):
 
 class McpServerCreateAndUpdateApi(Resource):
     @login_required
+    @swag_from(server_create_update_spec)
     def post(self):
         """创建或更新MCP服务器。
 
@@ -197,6 +216,7 @@ class McpServerCreateAndUpdateApi(Resource):
 
 class McpServerDeleteApi(Resource):
     @login_required
+    @swag_from(server_delete_spec)
     def post(self):
         """删除MCP服务器。
 
@@ -227,6 +247,7 @@ class McpServerDeleteApi(Resource):
 
 class McpServerPublishApi(Resource):
     @login_required
+    @swag_from(server_publish_spec)
     def post(self):
         """发布MCP服务器。
 
@@ -259,6 +280,7 @@ class McpServerPublishApi(Resource):
 
 class McpServerEnableApi(Resource):
     @login_required
+    @swag_from(server_enable_spec)
     def post(self):
         """启用或禁用MCP服务器。
 
@@ -299,6 +321,7 @@ class McpServerEnableApi(Resource):
 
 class McpToolListApi(Resource):
     @login_required
+    @swag_from(tool_list_spec)
     def post(self):
         """获取MCP工具列表。
 
@@ -333,6 +356,7 @@ class McpToolListApi(Resource):
 
 class McpToolDetailApi(Resource):
     @login_required
+    @swag_from(tool_detail_spec)
     def get(self):
         """获取MCP工具详细信息。
 
@@ -358,6 +382,7 @@ class McpToolDetailApi(Resource):
 
 class McpServerSyncToolsApi(Resource):
     @login_required
+    @swag_from(server_sync_tools_spec)
     def post(self):
         """同步MCP服务器的工具。
 
@@ -400,6 +425,7 @@ class McpServerSyncToolsApi(Resource):
 
 class McpToolTestApi(Resource):
     @login_required
+    @swag_from(tool_test_spec)
     def post(self):
         """测试MCP工具。
 
@@ -470,6 +496,7 @@ class McpToolTestApi(Resource):
 
 class MCPToolReferenceResult(Resource):
     @login_required
+    @swag_from(tool_reference_result_spec)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument("id", type=int, location="args")

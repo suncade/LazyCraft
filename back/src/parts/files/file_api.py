@@ -15,10 +15,12 @@
 
 import os
 
+from flasgger import swag_from
 from flask_restful import reqparse
 from werkzeug.datastructures import FileStorage
 
 from core.restful import Resource
+from docs.apidocs.files import file_upload_spec
 from libs.filetools import FileTools
 from parts.urls import api
 
@@ -26,6 +28,7 @@ LAZYLLM_UPLOAD_PATH = os.environ.get("LAZYLLM_UPLOAD_PATH", "")
 
 
 class AppFileUploadApi(Resource):
+    @swag_from(file_upload_spec)
     def post(self):
         """上传本地文件供大模型使用。
 

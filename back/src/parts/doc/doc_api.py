@@ -16,12 +16,25 @@
 import os.path
 from datetime import datetime
 
+from flasgger import swag_from
 from flask import Response, request, send_from_directory
 from flask_login import current_user
 from flask_restful import inputs, marshal, reqparse
 from jinja2 import Environment, FileSystemLoader
 
 from core.restful import Resource
+from docs.apidocs.doc import (
+    doc_list_spec,
+    doc_detail_get_spec,
+    doc_create_spec,
+    doc_update_spec,
+    doc_delete_spec,
+    doc_publish_spec,
+    doc_unpublish_spec,
+    doc_upload_image_spec,
+    doc_image_spec,
+    doc_view_spec,
+)
 from libs.login import login_required
 from parts.urls import api
 from utils.util_storage import storage
@@ -37,6 +50,7 @@ class DocListApi(Resource):
     提供获取文档列表的 RESTful 接口
     """
 
+    @swag_from(doc_list_spec)
     def get(self):
         """获取文档列表。
 
@@ -72,6 +86,7 @@ class DocApi(Resource):
     """
 
     @login_required
+    @swag_from(doc_detail_get_spec)
     def get(self):
         """获取单个文档详情。
 
@@ -86,6 +101,7 @@ class DocApi(Resource):
         return marshal(doc, fields.doc_detail_fields)
 
     @login_required
+    @swag_from(doc_create_spec)
     def post(self):
         """创建新文档。
 
@@ -99,6 +115,7 @@ class DocApi(Resource):
         return marshal(doc, fields.doc_detail_fields)
 
     @login_required
+    @swag_from(doc_delete_spec)
     def delete(self):
         """删除文档。
 
@@ -113,6 +130,7 @@ class DocApi(Resource):
         return service.delete_doc(args.get("id"))
 
     @login_required
+    @swag_from(doc_update_spec)
     def put(self):
         """更新文档。
 
@@ -133,6 +151,7 @@ class DocOperationPublishApi(Resource):
     """
 
     @login_required
+    @swag_from(doc_publish_spec)
     def get(self):
         """发布文档。
 
@@ -153,6 +172,7 @@ class DocOperatioUnPublishApi(Resource):
     """
 
     @login_required
+    @swag_from(doc_unpublish_spec)
     def get(self):
         """下架文档。
 
@@ -173,6 +193,7 @@ class DocUploadImage(Resource):
     """
 
     @login_required
+    @swag_from(doc_upload_image_spec)
     def post(self):
         """上传文档图片。
 
@@ -199,6 +220,7 @@ class DocImage(Resource):
     提供文档图片的访问和下载功能
     """
 
+    @swag_from(doc_image_spec)
     def get(self, subpath):
         """获取文档图片。
 
@@ -242,6 +264,7 @@ class DocView(Resource):
         )
     )
 
+    @swag_from(doc_view_spec)
     def get(self, subpath=None):
         """获取文档视图。
 

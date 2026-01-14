@@ -20,9 +20,11 @@ ECDH 密钥交换 API
 无需预先约定密钥，适合开源项目。
 """
 
+from flasgger import swag_from
 from flask_restful import reqparse
 
 from core.restful import Resource
+from docs.apidocs.auth import key_exchange_spec
 from parts.urls import api
 from utils.util_ecdh import ECDHSessionManager
 
@@ -37,6 +39,7 @@ class KeyExchangeApi(Resource):
     前端使用返回的公钥计算相同的共享密钥，然后使用共享密钥加密数据。
     """
     
+    @swag_from(key_exchange_spec)
     def post(self):
         """
         进行 ECDH 密钥交换

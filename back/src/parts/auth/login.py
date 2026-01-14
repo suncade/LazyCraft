@@ -17,12 +17,25 @@ import re
 from typing import cast
 
 import flask_login
+from flasgger import swag_from
 from flask import request
 from flask_login import current_user
 from flask_restful import fields, marshal, reqparse
 
 from core.account_manager import AccountService, RegisterService, TenantService
 from core.restful import Resource
+from docs.apidocs.auth import (
+    register_spec,
+    login_spec,
+    login_sms_spec,
+    logout_spec,
+    add_user_spec,
+    account_profile_spec,
+    account_password_spec,
+    account_update_spec,
+    sendsms_spec,
+    validate_exist_spec,
+)
 from libs.helper import TimestampField
 from libs.helper import email as EmailType
 from libs.helper import get_remote_ip
@@ -37,6 +50,7 @@ from .sms import SmsChecker
 
 
 class RegisterApi(Resource):
+    @swag_from(register_spec)
     def post(self):
         """注册新用户账号。
 
@@ -96,6 +110,7 @@ class RegisterApi(Resource):
 
 
 class AddUserApi(Resource):
+    @swag_from(add_user_spec)
     def post(self):
         """管理员添加用户。
 
@@ -145,7 +160,7 @@ class AddUserApi(Resource):
 
 
 class SendsmsApi(Resource):
-
+    @swag_from(sendsms_spec)
     def post(self):
         """发送短信验证码。
 
@@ -168,6 +183,7 @@ class SendsmsApi(Resource):
 
 
 class ValidateExistApi(Resource):
+    @swag_from(validate_exist_spec)
     def post(self):
         """校验用户信息唯一性。
 
@@ -209,6 +225,7 @@ def common_login(account):
 
 
 class LoginApi(Resource):
+    @swag_from(login_spec)
     def post(self):
         """用户密码登录。
 
@@ -261,6 +278,7 @@ class LoginApi(Resource):
 
 
 class LoginSmsApi(Resource):
+    @swag_from(login_sms_spec)
     def post(self):
         """短信验证码登录。
 
@@ -318,6 +336,7 @@ class LoginSmsApi(Resource):
 
 
 class LogoutApi(Resource):
+    @swag_from(logout_spec)
     def get(self):
         """用户退出登录。
 
@@ -356,6 +375,7 @@ account_fields = {
 
 class AccountProfileApi(Resource):
     @login_required
+    @swag_from(account_profile_spec)
     def get(self):
         """获取当前用户资料信息。
 
@@ -396,6 +416,7 @@ class AccountProfileApi(Resource):
 
 class AccountPasswordApi(Resource):
     @login_required
+    @swag_from(account_password_spec)
     def post(self):
         """修改用户密码。
 
@@ -429,6 +450,7 @@ class AccountPasswordApi(Resource):
 
 class AccountUpdateApi(Resource):
     @login_required
+    @swag_from(account_update_spec)
     def post(self):
         """更新用户基本信息。
 

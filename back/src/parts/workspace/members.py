@@ -15,6 +15,7 @@
 
 import json
 
+from flasgger import swag_from
 from flask import request
 from flask_login import current_user
 from flask_restful import marshal, reqparse
@@ -23,6 +24,38 @@ from core.account_manager import QuotaService, TenantService
 from core.asset_manager import AssetManager
 from core.cooperation_service import CooperationService
 from core.restful import ForbiddenError, Resource
+from docs.apidocs.workspace import (
+    all_user_list_spec,
+    select_user_list_spec,
+    tenant_user_list_spec,
+    all_tenant_list_spec,
+    account_tenant_list_spec,
+    current_tenant_list_spec,
+    current_tenant_id_spec,
+    switch_tenant_spec,
+    add_tenant_spec,
+    detail_tenant_spec,
+    update_roles_spec,
+    move_assets_spec,
+    delete_tenant_spec,
+    exit_tenant_spec,
+    delete_role_spec,
+    delete_account_spec,
+    coop_status_spec,
+    coop_open_spec,
+    coop_close_spec,
+    coop_join_list_spec,
+    storage_check_spec,
+    personal_space_get_spec,
+    personal_space_post_spec,
+    quota_request_list_spec,
+    quota_request_spec,
+    quota_request_detail_spec,
+    quota_request_action_spec,
+    ai_tool_set_spec,
+    ai_tool_list_spec,
+    tenant_enable_ai_spec,
+)
 from libs.login import login_required
 from models.model_account import (Account, QuotaStatus, RoleTypes, Tenant,
                                   TenantAccountJoin)
@@ -41,6 +74,7 @@ class AllUserListApi(Resource):
     """
 
     @login_required
+    @swag_from(all_user_list_spec)
     def get(self):
         """查看所有的用户。
 
@@ -83,6 +117,7 @@ class SelectUserListApi(Resource):
     """
 
     @login_required
+    @swag_from(select_user_list_spec)
     def get(self):
         """查看所有的用户(仅在选择用户列表中使用)。
 
@@ -120,6 +155,7 @@ class AllTenantListApi(Resource):
     """
 
     @login_required
+    @swag_from(all_tenant_list_spec)
     def get(self):
         """查看所有的租户。
 
@@ -169,6 +205,7 @@ class AccountTenantListApi(Resource):
     """
 
     @login_required
+    @swag_from(account_tenant_list_spec)
     def get(self):
         """查看用户加入的租户。
 
@@ -206,6 +243,7 @@ class CurrentTenantListApi(Resource):
     """
 
     @login_required
+    @swag_from(current_tenant_list_spec)
     def get(self):
         """查看当前用户加入的租户。
 
@@ -227,6 +265,7 @@ class CurrentTenantIdApi(Resource):
     """
 
     @login_required
+    @swag_from(current_tenant_id_spec)
     def get(self):
         """查看当前租户。
 
@@ -244,6 +283,7 @@ class SwitchTenantApi(Resource):
     """
 
     @login_required
+    @swag_from(switch_tenant_spec)
     def post(self):
         """切换租户。
 
@@ -266,6 +306,7 @@ class AddTenantApi(Resource):
     """
 
     @login_required
+    @swag_from(add_tenant_spec)
     def post(self):
         """添加租户。
 
@@ -304,6 +345,7 @@ class DetailTenantApi(Resource):
     """
 
     @login_required
+    @swag_from(detail_tenant_spec)
     def get(self):
         """查看租户用户详细。
 
@@ -341,6 +383,7 @@ class UpdateRolesApi(Resource):
     """
 
     @login_required
+    @swag_from(update_roles_spec)
     def post(self):
         """修改租户内的用户身份
         "data_list": [
@@ -464,6 +507,7 @@ class UpdateRolesApi(Resource):
 
 class TenantUserListApi(Resource):
     @login_required
+    @swag_from(tenant_user_list_spec)
     def get(self):
         """查询当前租户下全部用户列表"""
         self.check_can_read()
@@ -476,6 +520,7 @@ class TenantUserListApi(Resource):
 
 class MoveAssetsApi(Resource):
     @login_required
+    @swag_from(move_assets_spec)
     def post(self):
         """迁移资产"""
         parser = reqparse.RequestParser()
@@ -505,6 +550,7 @@ class MoveAssetsApi(Resource):
 
 class DeleteTenantApi(Resource):
     @login_required
+    @swag_from(delete_tenant_spec)
     def post(self):
         """删除租户"""
         parser = reqparse.RequestParser()
@@ -542,6 +588,7 @@ class DeleteTenantApi(Resource):
 
 class ExitTenantApi(Resource):
     @login_required
+    @swag_from(exit_tenant_spec)
     def post(self):
         """退出租户"""
         parser = reqparse.RequestParser()
@@ -569,6 +616,7 @@ class ExitTenantApi(Resource):
 
 class DeleteRoleApi(Resource):
     @login_required
+    @swag_from(delete_role_spec)
     def post(self):
         """从租户中删除用户"""
         parser = reqparse.RequestParser()
@@ -616,6 +664,7 @@ class DeleteRoleApi(Resource):
 
 class DeleteAccountApi(Resource):
     @login_required
+    @swag_from(delete_account_spec)
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument("account_id", type=str, required=True, location="json")
@@ -669,6 +718,7 @@ class DeleteAccountApi(Resource):
 
 class CoopStatusApi(Resource):
     @login_required
+    @swag_from(coop_status_spec)
     def get(self):
         """查询协作的设置详情"""
         parser = reqparse.RequestParser()
@@ -689,6 +739,7 @@ class CoopStatusApi(Resource):
 
 class CoopOpenApi(Resource):
     @login_required
+    @swag_from(coop_open_spec)
     def post(self):
         """打开协作"""
         parser = reqparse.RequestParser()
@@ -711,6 +762,7 @@ class CoopOpenApi(Resource):
 
 class CoopCloseApi(Resource):
     @login_required
+    @swag_from(coop_close_spec)
     def post(self):
         """关闭协作"""
         parser = reqparse.RequestParser()
@@ -732,6 +784,7 @@ class CoopCloseApi(Resource):
 
 class CoopJoinListApi(Resource):
     @login_required
+    @swag_from(coop_join_list_spec)
     def get(self):
         """查看自己被加入协作的列表"""
         parser = reqparse.RequestParser()
@@ -746,6 +799,7 @@ class CoopJoinListApi(Resource):
 
 class WorkspacesStorageCheckApi(Resource):
     @login_required
+    @swag_from(storage_check_spec)
     def get(self):
         """查看当前工作组的存储空间使用情况"""
         self.check_can_read()
@@ -755,6 +809,7 @@ class WorkspacesStorageCheckApi(Resource):
 
 class PersonalSpaceResourceApi(Resource):
     @login_required
+    @swag_from(personal_space_get_spec)
     def get(self):
         """获取个人空间资源配置信息"""
         parser = reqparse.RequestParser()
@@ -765,6 +820,7 @@ class PersonalSpaceResourceApi(Resource):
         return TenantService.get_personal_space_resources(args.get("account_id"))
 
     @login_required
+    @swag_from(personal_space_post_spec)
     def post(self):
         """修改个人空间GPU配额"""
         parser = reqparse.RequestParser()
@@ -785,6 +841,7 @@ class PersonalSpaceResourceApi(Resource):
 
 class QuotaRequestListApi(Resource):
     @login_required
+    @swag_from(quota_request_list_spec)
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument("page", type=int, default=1, location="json")
@@ -803,6 +860,7 @@ class QuotaRequestListApi(Resource):
 
 class QuotaRequestApi(Resource):
     @login_required
+    @swag_from(quota_request_spec)
     def post(self):
 
         # 提交配额申请
@@ -840,6 +898,7 @@ class QuotaRequestApi(Resource):
 
 class QuotaRequestDetailApi(Resource):
     @login_required
+    @swag_from(quota_request_detail_spec)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument("request_id", type=str, required=True, location="args")
@@ -859,6 +918,7 @@ class QuotaRequestDetailApi(Resource):
 
 class QuotaRequestActionApi(Resource):
     @login_required
+    @swag_from(quota_request_action_spec)
     def post(self):
         # 管理员处理申请
         data = request.get_json()
@@ -896,6 +956,7 @@ class QuotaRequestActionApi(Resource):
 
 class AIToolSetApi(Resource):
     @login_required
+    @swag_from(ai_tool_set_spec)
     def post(self):
         """设置租户的AI能力配置。
 
@@ -937,6 +998,7 @@ class AIToolSetApi(Resource):
 
 class AIToolListApi(Resource):
     @login_required
+    @swag_from(ai_tool_list_spec)
     def get(self):
         """获取租户的AI能力配置。
 
@@ -974,6 +1036,7 @@ class AIToolListApi(Resource):
 
 class TenantSetEnableAIApi(Resource):
     @login_required
+    @swag_from(tenant_enable_ai_spec)
     def post(self):
         """设置是否开启租户的AI能力。
 

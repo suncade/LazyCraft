@@ -15,10 +15,25 @@
 
 import logging
 
+from flasgger import swag_from
 from flask import jsonify, request
 from flask_login import current_user
 
 from core.restful import Resource
+from docs.apidocs.inferservice import (
+    service_list_spec,
+    model_list_spec,
+    create_service_group_spec,
+    create_service_spec,
+    start_service_group_spec,
+    close_service_group_spec,
+    start_service_spec,
+    stop_service_spec,
+    delete_service_spec,
+    draw_service_list_spec,
+    ams_model_list_spec,
+    cloud_service_status_spec,
+)
 from libs.feature_gate import require_internet_feature
 from libs.helper import build_response
 from libs.login import login_required
@@ -75,6 +90,7 @@ class ListService(Resource):
         self.infer_service = InferService()
 
     @login_required
+    @swag_from(service_list_spec)
     def post(self):
         """处理POST请求，分页获取推理服务列表。
 
@@ -118,6 +134,7 @@ class CloudServiceStatusApi(Resource):
     """cloud-service 状态查询接口。"""
 
     @login_required
+    @swag_from(cloud_service_status_spec)
     def get(self):
         self.check_can_read()
         
@@ -142,6 +159,7 @@ class CreateServiceGroup(Resource):
 
     @login_required
     @require_internet_feature("推理服务")
+    @swag_from(create_service_group_spec)
     def post(self):
         """处理POST请求，创建推理服务组。
 
@@ -195,6 +213,7 @@ class CreateService(Resource):
 
     @login_required
     @require_internet_feature("推理服务")
+    @swag_from(create_service_spec)
     def post(self):
         """处理POST请求，创建推理服务。
 
@@ -248,6 +267,7 @@ class StartServiceGroup(Resource):
 
     @login_required
     @require_internet_feature("推理服务")
+    @swag_from(start_service_group_spec)
     def post(self):
         """处理POST请求，启动推理服务组。
 
@@ -300,6 +320,7 @@ class StartService(Resource):
 
     @login_required
     @require_internet_feature("推理服务")
+    @swag_from(start_service_spec)
     def post(self):
         """处理POST请求，启动推理服务。
 
@@ -350,6 +371,7 @@ class StopService(Resource):
         self.infer_service = InferService()
 
     @login_required
+    @swag_from(stop_service_spec)
     def post(self):
         """处理POST请求，停止推理服务。
 
@@ -399,6 +421,7 @@ class DeleteService(Resource):
         self.infer_service = InferService()
 
     @login_required
+    @swag_from(delete_service_spec)
     def post(self):
         """处理POST请求，删除推理服务。
 
@@ -459,6 +482,7 @@ class CloseServiceGroup(Resource):
         self.infer_service = InferService()
 
     @login_required
+    @swag_from(close_service_group_spec)
     def post(self):
         """处理POST请求，关闭推理服务组。
 
@@ -511,6 +535,7 @@ class ModelListService(Resource):
         self.infer_service = InferService()
 
     @login_required
+    @swag_from(model_list_spec)
     def get(self):
         """处理GET请求，获取模型列表。
 
@@ -579,6 +604,7 @@ class ListForDrawService(Resource):
         self.infer_service = InferService()
 
     @login_required
+    @swag_from(draw_service_list_spec)
     def get(self):
         """处理GET请求，获取在线模型列表。
 
@@ -622,6 +648,7 @@ class AMSModelListService(Resource):
         self.infer_service = InferService()
 
     @login_required
+    @swag_from(ams_model_list_spec)
     def get(self):
         """处理GET请求，获取AMS支持的本地模型列表。
 

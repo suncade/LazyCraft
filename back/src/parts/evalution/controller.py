@@ -26,6 +26,7 @@ from datetime import datetime
 from threading import Thread
 
 import pandas as pd
+from flasgger import swag_from
 from flask import (copy_current_request_context, current_app, request,
                    send_from_directory)
 from flask_login import current_user
@@ -34,6 +35,21 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment
 
 from core.restful import Resource
+from docs.apidocs.evalution import (
+    upload_dataset_spec,
+    create_task_spec,
+    evaluation_dimension_spec,
+    evaluate_spec,
+    task_info_spec,
+    task_list_spec,
+    delete_task_spec,
+    evaluation_data_paginator_spec,
+    evaluation_model_spec,
+    evaluation_online_data_spec,
+    evaluation_summary_spec,
+    download_report_excel_spec,
+    download_dataset_tpl_spec,
+)
 from libs.feature_gate import require_internet_feature
 from libs.filetools import FileTools
 from libs.helper import build_response
@@ -178,6 +194,7 @@ class UploadDataset(Resource):
 
     # 上传数据集文件
     @login_required
+    @swag_from(upload_dataset_spec)
     def post(self):
         """上传评估数据集文件。
 
@@ -285,6 +302,7 @@ class TaskList(Resource):
     """
 
     @login_required
+    @swag_from(task_list_spec)
     def get(self):
         """获取评估任务分页列表。
 
@@ -353,6 +371,7 @@ class DeleteTask(Resource):
     """
 
     @login_required
+    @swag_from(delete_task_spec)
     def post(self, task_id):
         """删除指定的评估任务。
 
@@ -404,6 +423,7 @@ class CreateTask(Resource):
     """
 
     @login_required
+    @swag_from(create_task_spec)
     def post(self):
         """创建新的评估任务。
 
@@ -519,6 +539,7 @@ class EvaluationDimension(Resource):
     """
 
     @login_required
+    @swag_from(evaluation_dimension_spec)
     def get(self, task_id):
         """获取指定任务的评估维度信息。
 
@@ -570,6 +591,7 @@ class Evaluate(Resource):
 
     @login_required
     @require_internet_feature("模型评测")
+    @swag_from(evaluate_spec)
     def post(self):
         """执行评估任务。
 
@@ -642,6 +664,7 @@ class TaskInfo(Resource):
     """
 
     @login_required
+    @swag_from(task_info_spec)
     def get(self, task_id):
         """获取指定评估任务的详细信息。
 
@@ -738,6 +761,7 @@ class EvaluationDataPaginator(Resource):
         dict: 分页结果，包含评估数据列表和分页信息。
     """
 
+    @swag_from(evaluation_data_paginator_spec)
     def get(self, task_id):
         """获取评估数据分页列表。
 
@@ -781,6 +805,7 @@ class EvluationModel(Resource):
     """
 
     @login_required
+    @swag_from(evaluation_model_spec)
     def get(self):
         """获取可用的评估模型列表。
 
@@ -798,6 +823,7 @@ class EvluationOnlineData(Resource):
     """
 
     @login_required
+    @swag_from(evaluation_online_data_spec)
     def get(self):
         """获取在线评估数据。
 
@@ -821,6 +847,7 @@ class EvaluationSummaryAPI(Resource):
     """
 
     @login_required
+    @swag_from(evaluation_summary_spec)
     def get(self, task_id):
         """获取指定任务的评估总结信息。
 
@@ -1033,6 +1060,7 @@ class DownloadReportExcel(Resource):
             return False
         return False
 
+    @swag_from(download_report_excel_spec)
     def get(self, task_id):
         """下载评估任务的Excel报告。
 
@@ -1152,6 +1180,7 @@ class DownloadDatasetTpl(Resource):
         ValueError: 当模板类型不支持时抛出异常。
     """
 
+    @swag_from(download_dataset_tpl_spec)
     def get(self, template_type):
         """下载指定类型的评估数据集模板。
 

@@ -17,11 +17,38 @@ import logging
 import os
 from threading import Thread
 
+from flasgger import swag_from
 from flask import copy_current_request_context, current_app, g, request
 from flask_login import current_user
 from flask_restful import marshal, reqparse
 
 from core.restful import Resource
+from docs.apidocs.models_hub import (
+    model_list_spec,
+    model_create_spec,
+    online_model_list_create_spec,
+    online_model_list_delete_spec,
+    update_apikey_spec,
+    delete_apikey_spec,
+    retry_download_spec,
+    finetune_retry_download_spec,
+    models_tree_spec,
+    model_update_spec,
+    model_delete_spec,
+    icon_upload_spec,
+    upload_file_chunk_spec,
+    merge_file_spec,
+    delete_uploaded_file_spec,
+    check_model_name_spec,
+    model_info_spec,
+    create_finetune_spec,
+    delete_finetune_model_spec,
+    finetune_model_list_spec,
+    online_model_support_list_spec,
+    update_online_model_list_spec,
+    exist_model_list_spec,
+    default_icon_list_spec,
+)
 from libs.filetools import FileTools
 from libs.http_exception import CommonError
 from libs.login import login_required
@@ -39,6 +66,7 @@ from .service import ModelService
 
 class modelHubListApi(Resource):
     @login_required
+    @swag_from(model_list_spec)
     def post(self):
         """查询模型翻页列表。
         
@@ -96,6 +124,7 @@ class modelHubListApi(Resource):
 
 class modelCreateApi(Resource):
     @login_required
+    @swag_from(model_create_spec)
     def post(self):
         """创建新模型。
         
@@ -207,6 +236,7 @@ class modelCreateApi(Resource):
 
 class ModelOnlineListApi(Resource):
     @login_required
+    @swag_from(online_model_list_create_spec)
     def post(self):
         """保存在线模型列表。
         
@@ -233,6 +263,7 @@ class ModelOnlineListApi(Resource):
 
 class ModelOnlineListDeleteApi(Resource):
     @login_required
+    @swag_from(online_model_list_delete_spec)
     def post(self):
         """删除在线模型列表中的指定模型。
         
@@ -261,6 +292,7 @@ class ModelOnlineListDeleteApi(Resource):
 
 class modelRetryDownloadApi(Resource):
     @login_required
+    @swag_from(retry_download_spec)
     def get(self, model_id):
         """重试下载模型。
         
@@ -297,6 +329,7 @@ class modelRetryDownloadApi(Resource):
 
 class modelFinetuneRetryDownloadApi(Resource):
     @login_required
+    @swag_from(finetune_retry_download_spec)
     def get(self, model_id, finetune_model_id):
         """重试下载微调模型。
         
@@ -342,6 +375,7 @@ class modelFinetuneRetryDownloadApi(Resource):
 
 class modelHubUpdateApi(Resource):
     @login_required
+    @swag_from(model_update_spec)
     def post(self):
         """更新模型配置。
         
@@ -381,6 +415,7 @@ class modelHubUpdateApi(Resource):
 
 class ModelHubUpdateApiKeyApi(Resource):
     @login_required
+    @swag_from(update_apikey_spec)
     def post(self):
         """根据 model_brand 和 api_key 新增或更新 LazyModelConfigInfo 中的 api_key。
         
@@ -412,6 +447,7 @@ class ModelHubUpdateApiKeyApi(Resource):
         return {"status": "success", "result": result}
 
     @login_required
+    @swag_from(delete_apikey_spec)
     def delete(self):
         """清除数据库中的 api_key。
         
@@ -434,6 +470,7 @@ class ModelHubUpdateApiKeyApi(Resource):
 
 class modelHubDeleteApi(Resource):
     @login_required
+    @swag_from(model_delete_spec)
     def post(self):
         """删除模型。
         
@@ -479,6 +516,7 @@ class modelHubDeleteApi(Resource):
 
 class modelIconUploadApi(Resource):
     @login_required
+    @swag_from(icon_upload_spec)
     def post(self):
         """上传模型图标文件。
         
@@ -511,6 +549,7 @@ class modelIconUploadApi(Resource):
 
 class modelHubUploadFileChunkApi(Resource):
     @login_required
+    @swag_from(upload_file_chunk_spec)
     def post(self):
         """上传本地模型文件分片。
         
@@ -547,6 +586,7 @@ class modelHubUploadFileChunkApi(Resource):
 
 class modelHubUploadFileMergeApi(Resource):
     @login_required
+    @swag_from(merge_file_spec)
     def post(self):
         """合并本地模型文件分片。
         
@@ -571,6 +611,7 @@ class modelHubUploadFileMergeApi(Resource):
 
 class ModelHubDeleteUploadedFileApi(Resource):
     @login_required
+    @swag_from(delete_uploaded_file_spec)
     def post(self):
         """删除上传但未被引用的模型文件或分片临时目录。
         
@@ -600,6 +641,7 @@ class ModelHubDeleteUploadedFileApi(Resource):
 
 class modelHubCheckModelNameApi(Resource):
     @login_required
+    @swag_from(check_model_name_spec)
     def post(self):
         """检查模型名称是否合法。
         
@@ -632,6 +674,7 @@ class modelHubCheckModelNameApi(Resource):
 
 class ModelHubModelsTreeApi(Resource):
     @login_required
+    @swag_from(models_tree_spec)
     def get(self):
         """获取模型树结构。
         
@@ -668,6 +711,7 @@ class ModelHubModelsTreeApi(Resource):
 
 class ModelHubModelInfoApi(Resource):
     @login_required
+    @swag_from(model_info_spec)
     def get(self, model_id):
         """获取模型详细信息。
         
@@ -699,6 +743,7 @@ class ModelHubModelInfoApi(Resource):
 
 class ModelCreateFinetuneApi(Resource):
     @login_required
+    @swag_from(create_finetune_spec)
     def post(self):
         """创建微调模型。
         
@@ -785,6 +830,7 @@ class ModelCreateFinetuneApi(Resource):
 
 class ModelHubModelFinetuneDeleteApi(Resource):
     @login_required
+    @swag_from(delete_finetune_model_spec)
     def delete(self, model_id, finetune_model_id):
         """删除微调模型。
         
@@ -810,6 +856,7 @@ class ModelHubModelFinetuneDeleteApi(Resource):
 
 class ModelHubModelFinetuneListApi(Resource):
     @login_required
+    @swag_from(finetune_model_list_spec)
     def post(self):
         """获取微调模型分页列表。
         
@@ -851,6 +898,7 @@ class ModelHubModelFinetuneListApi(Resource):
 
 class ModelHubOnlineModelSupportListApi(Resource):
     @login_required
+    @swag_from(online_model_support_list_spec)
     def get(self):
         """获取支持的在线模型列表。
         
@@ -863,6 +911,7 @@ class ModelHubOnlineModelSupportListApi(Resource):
 
 class ModelUpdateOnlineModelListApi(Resource):
     @login_required
+    @swag_from(update_online_model_list_spec)
     def post(self):
         """更新在线模型列表。
         
@@ -906,6 +955,7 @@ class ModelUpdateOnlineModelListApi(Resource):
 
 class ModelHubExistModelListApi(Resource):
     @login_required
+    @swag_from(exist_model_list_spec)
     def get(self):
         """获取已存在的第三方模型列表。
         
@@ -920,6 +970,7 @@ class ModelHubExistModelListApi(Resource):
 
 class ModelHubDefaultIconListApi(Resource):
     @login_required
+    @swag_from(default_icon_list_spec)
     def get(self):
         """获取默认图标列表。
         

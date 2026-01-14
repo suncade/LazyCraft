@@ -18,11 +18,35 @@ import os
 import tempfile
 from datetime import datetime
 
+from flasgger import swag_from
 from flask import request, send_from_directory
 from flask_login import current_user
 from flask_restful import marshal, reqparse
 
 from core.restful import Resource
+from docs.apidocs.tools import (
+    tool_list_spec,
+    tool_detail_spec,
+    tool_check_name_spec,
+    tool_create_update_spec,
+    tool_delete_spec,
+    tool_field_create_update_spec,
+    tool_fields_detail_spec,
+    tool_api_create_update_spec,
+    tool_api_detail_spec,
+    tool_publish_spec,
+    tool_cancel_publish_spec,
+    tool_enable_spec,
+    tool_copy_spec,
+    tool_test_spec,
+    tool_test_log_spec,
+    tool_auth_return_url_spec,
+    tool_auth_callback_spec,
+    tool_auth_share_spec,
+    tool_auth_delete_spec,
+    tool_export_spec,
+    tool_reference_result_spec,
+)
 from libs.feature_gate import require_internet_feature
 from libs.login import login_required
 from parts.logs import Action, LogService, Module
@@ -37,6 +61,7 @@ from .websocket_handle import get_tool_logger
 class ToolListApi(Resource):
 
     @login_required
+    @swag_from(tool_list_spec)
     def post(self):
         """获取工具分页列表。
 
@@ -95,6 +120,7 @@ class ToolListApi(Resource):
 
 class ToolDetailApi(Resource):
     @login_required
+    @swag_from(tool_detail_spec)
     def get(self):
         """工具详情"""
         tool_id = request.args.get("tool_id", type=str)
@@ -106,6 +132,7 @@ class ToolDetailApi(Resource):
 
 class ToolCheckName(Resource):
     @login_required
+    @swag_from(tool_check_name_spec)
     def post(self):
         """检查名字重复"""
         data = request.json
@@ -121,6 +148,7 @@ class ToolCheckName(Resource):
 
 class ToolCreateAndUpdateApi(Resource):
     @login_required
+    @swag_from(tool_create_update_spec)
     def post(self):
         """创建与更新工具"""
         data = request.json
@@ -158,6 +186,7 @@ class ToolCreateAndUpdateApi(Resource):
 
 class ToolDeleteApi(Resource):
     @login_required
+    @swag_from(tool_delete_spec)
     def post(self):
         """删除工具"""
         data = request.json
@@ -179,6 +208,7 @@ class ToolDeleteApi(Resource):
 class ToolFieldCreateAndUpdateApi(Resource):
 
     @login_required
+    @swag_from(tool_field_create_update_spec)
     def post(self):
         """field部分的页面编辑(API+IDE两种模式都有，每次都是新增数据)"""
         data = request.json
@@ -222,6 +252,7 @@ class ToolFieldCreateAndUpdateApi(Resource):
 class ToolFieldsDetailApi(Resource):
 
     @login_required
+    @swag_from(tool_fields_detail_spec)
     def post(self):
         """field部分的数据详情(API+IDE两种模式都有)"""
         # 获取 JSON 数据
@@ -270,6 +301,7 @@ class ToolFieldsDetailApi(Resource):
 class ToolApiCreateAndUpdateApi(Resource):
 
     @login_required
+    @swag_from(tool_api_create_update_spec)
     def post(self):
         """HTTP部分的页面编辑(每次都是新增就很诡异)"""
         data = request.json
@@ -295,6 +327,7 @@ class ToolApiCreateAndUpdateApi(Resource):
 class ToolApiDetailApi(Resource):
 
     @login_required
+    @swag_from(tool_api_detail_spec)
     def get(self):
         """HTTP部分的数据详情"""
         tool_api_id = request.args.get("api_id", default=0, type=int)
@@ -312,6 +345,7 @@ class ToolApiDetailApi(Resource):
 
 class ToolPublishApi(Resource):
     @login_required
+    @swag_from(tool_publish_spec)
     def post(self):
         """发布工具"""
         parser = reqparse.RequestParser()
@@ -336,6 +370,7 @@ class ToolPublishApi(Resource):
 
 class ToolCancelPublishApi(Resource):
     @login_required
+    @swag_from(tool_cancel_publish_spec)
     def post(self):
         """发布工具"""
         parser = reqparse.RequestParser()
@@ -354,6 +389,7 @@ class ToolCancelPublishApi(Resource):
 
 class ToolEnableApi(Resource):
     @login_required
+    @swag_from(tool_enable_spec)
     def post(self):
         """启用工具"""
         data = request.json
@@ -383,6 +419,7 @@ class ToolEnableApi(Resource):
 
 class ToolCopyApi(Resource):
     @login_required
+    @swag_from(tool_copy_spec)
     def post(self):
         """复制一份新的工具"""
         parser = reqparse.RequestParser()
@@ -411,6 +448,7 @@ class ToolCopyApi(Resource):
 class ToolTestApi(Resource):
     @login_required
     @require_internet_feature("工具运行")
+    @swag_from(tool_test_spec)
     def post(self):
         data = request.json
         if not data:
@@ -431,6 +469,7 @@ class ToolTestApi(Resource):
 
 class TestApi(Resource):
     @login_required
+    @swag_from(tool_test_log_spec)
     def post(self):
         data = request.json
         if not data:
@@ -448,6 +487,7 @@ class TestApi(Resource):
 # 生成对应的授权URL
 class ToolAuthByUserReturnUrlApi(Resource):
     @login_required
+    @swag_from(tool_auth_return_url_spec)
     def post(self):
         data = request.json
         if not data:
@@ -465,6 +505,7 @@ class ToolAuthByUserReturnUrlApi(Resource):
 
 class ToolAuthShare(Resource):
     @login_required
+    @swag_from(tool_auth_share_spec)
     def post(self):
         data = request.json
         if not data:
@@ -483,6 +524,7 @@ class ToolAuthShare(Resource):
 
 class ToolAuthDeleteAuthByUser(Resource):
     @login_required
+    @swag_from(tool_auth_delete_spec)
     def post(self):
         data = request.json
         if not data:
@@ -498,6 +540,7 @@ class ToolAuthDeleteAuthByUser(Resource):
 
 
 class ToolAuthCallBack(Resource):
+    @swag_from(tool_auth_callback_spec)
     def get(self):
         code = request.args.get("code")
         state = request.args.get("state")
@@ -507,6 +550,7 @@ class ToolAuthCallBack(Resource):
 
 class ToolExportApi(Resource):
     @login_required
+    @swag_from(tool_export_spec)
     def get(self):
         """导出文件"""
         parser = reqparse.RequestParser()
@@ -534,6 +578,7 @@ class ToolExportApi(Resource):
 
 
 class ToolReferenceResult(Resource):
+    @swag_from(tool_reference_result_spec)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument("id", type=int, location="args")

@@ -31,6 +31,7 @@ from werkzeug.exceptions import Unauthorized
 from configs import lazy_config
 from core import contexts
 from core.account_manager import AccountService
+from core.swagger_config import init_swagger
 from libs.passport import PassportService
 from parts.models_hub.websocket_handle import \
     init_websocket as model_hub_websocket
@@ -65,6 +66,7 @@ class MyApp:
         init_websocket(self.app)
         model_hub_websocket(self.app)
         self.initialize_app_restart()
+        init_swagger(self.app)
 
     def create_flask_app_with_configs(self) -> Flask:
         app = Flask(__name__)
@@ -212,6 +214,12 @@ def before_request():
         f"Request started: {request.method} {request.path} from {request.remote_addr}"
     )
 
+    if request.path in ['/api-docs', '/apispec.json']:
+        swagger_enabled = os.getenv('SWAGGER_ENABLED', 'true').lower() == 'true'
+
+        if not swagger_enabled:
+            from flask import abort
+            abort(404)
 
 @app.after_request
 def after_request(response):
